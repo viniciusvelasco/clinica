@@ -50,34 +50,42 @@ export default function LoginPage() {
           />
           <div className="absolute inset-0 bg-gradient-to-br from-primary/95 via-primary/70 to-transparent" />
         </div>
-        <div className="relative z-10 flex flex-col justify-center h-full p-16 max-w-3xl">
-          <div className="space-y-8">
-            <div>
-              <h1 className="text-5xl font-bold text-white mb-6">
-                {systemName}
+        <div className="relative z-10 flex flex-col justify-center h-full p-16">
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <h1 className="text-4xl font-bold text-white">
+                Bem-vindo ao {systemName}
               </h1>
-              <p className="text-2xl text-white/90">
-                Transformando a gestão da sua clínica com tecnologia e inovação
+              <p className="text-xl text-white/90">
+                Sistema completo para gestão da sua clínica
               </p>
             </div>
-            
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 space-y-6">
-              <p className="text-lg text-white/90">
-                Simplifique processos, otimize agendamentos e melhore a experiência dos seus pacientes com nossa solução completa.
-              </p>
-              <div className="grid grid-cols-3 gap-8">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-white">+1000</div>
-                  <div className="text-sm text-white/80 mt-1">Pacientes Atendidos</div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {features.map((feature, index) => (
+                <div
+                  key={index}
+                  className="flex flex-col items-center space-y-2 bg-white/10 backdrop-blur-sm rounded-lg p-4"
+                >
+                  {feature.icon}
+                  <h3 className="text-lg font-semibold text-white">{feature.title}</h3>
+                  <p className="text-sm text-white/80 text-center">{feature.description}</p>
                 </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-white">98%</div>
-                  <div className="text-sm text-white/80 mt-1">Satisfação</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-white">-30%</div>
-                  <div className="text-sm text-white/80 mt-1">Tempo de Espera</div>
-                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-3 gap-8 bg-white/10 backdrop-blur-sm rounded-lg p-6">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-white">+1000</div>
+                <div className="text-sm text-white/80">Pacientes Atendidos</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-white">98%</div>
+                <div className="text-sm text-white/80">Satisfação</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-white">-30%</div>
+                <div className="text-sm text-white/80">Tempo de Espera</div>
               </div>
             </div>
           </div>
