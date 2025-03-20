@@ -2,25 +2,23 @@
 
 import Image from "next/image";
 import React from "react";
+import { features } from "./login-features";
 
-export default function LoginBanner() {
+export function LoginBanner() {
   const systemName = process.env.NEXT_PUBLIC_SYSTEM_NAME || "Sistema Médico";
 
   return (
     <div className="relative w-full h-screen flex flex-col items-center justify-center bg-[#3A86FF] overflow-hidden">
       {/* Imagem de fundo com overlay */}
-      <div className="absolute inset-0 z-0">
-        <div className="relative w-full h-full">
-          <Image
-            src="/images/medical-banner.jpg"
-            alt="Background médico"
-            fill
-            priority
-            sizes="(max-width: 768px) 100vw, 70vw"
-            className="object-cover opacity-30"
-          />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-[#4361EE]/80 to-[#3A86FF]/70" />
+      <div className="absolute inset-0">
+        <Image
+          src="/images/doctors-team.jpg"
+          alt="Equipe médica"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/95 via-primary/70 to-transparent" />
       </div>
 
       {/* Conteúdo sobreposto */}
@@ -50,67 +48,4 @@ export default function LoginBanner() {
       <div className="absolute top-12 left-12 w-16 h-16 rounded-full bg-[#FFD166]/20 backdrop-blur-sm"></div>
     </div>
   );
-}
-
-const features = [
-  {
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-6 w-6 lg:h-8 lg:w-8 text-white"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-        />
-      </svg>
-    ),
-    title: "Agendamentos",
-    description: "Gerencie consultas com facilidade",
-  },
-  {
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-6 w-6 lg:h-8 lg:w-8 text-white"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-        />
-      </svg>
-    ),
-    title: "Pacientes",
-    description: "Histórico e prontuários completos",
-  },
-  {
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-6 w-6 lg:h-8 lg:w-8 text-white"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
-      </svg>
-    ),
-    title: "Segurança",
-    description: "Dados protegidos conforme LGPD",
-  },
-]; 
+} 
