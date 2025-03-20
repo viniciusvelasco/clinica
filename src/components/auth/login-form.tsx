@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginFormValues } from "@/lib/validations/auth";
-import { WhiteInput } from "@/components/ui/input";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -121,10 +121,10 @@ export default function LoginForm() {
     <div className="w-full min-h-full flex items-center justify-center py-6 sm:py-8 px-4 sm:px-6 md:px-8 lg:px-10">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="inline-block mb-3 p-3 bg-[#3A86FF]/10 rounded-2xl">
+          <div className="inline-block mb-3 p-3 bg-primary/10 rounded-2xl">
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
-              className="h-8 w-8 text-[#3A86FF]" 
+              className="h-8 w-8 text-primary" 
               fill="none" 
               viewBox="0 0 24 24" 
               stroke="currentColor"
@@ -137,17 +137,17 @@ export default function LoginForm() {
               />
             </svg>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-[#1B1F3B] mb-2">Bem-vindo de volta</h2>
-          <p className="text-sm sm:text-base text-[#6C7086]">Entre com suas credenciais para acessar o {systemName}</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Bem-vindo de volta</h2>
+          <p className="text-sm sm:text-base text-muted-foreground">Entre com suas credenciais para acessar o {systemName}</p>
         </div>
         
-        <div className="bg-[#F8F9FA]/50 backdrop-blur-sm rounded-xl border border-[#E2E8F0] shadow-sm p-6 sm:p-8">
+        <div className="bg-card/50 backdrop-blur-sm rounded-xl border shadow-sm p-6 sm:p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {error && (
-              <div className="rounded-lg bg-[#EF4444]/10 p-3 border-l-4 border-[#EF4444] animate-pulse">
+              <div className="rounded-lg bg-destructive/10 p-3 border-l-4 border-destructive animate-pulse">
                 <div className="flex items-center">
-                  <ExclamationTriangleIcon className="h-5 w-5 text-[#EF4444] mr-2 flex-shrink-0" />
-                  <p className="text-xs sm:text-sm font-medium text-[#EF4444]">{error}</p>
+                  <ExclamationTriangleIcon className="h-5 w-5 text-destructive mr-2 flex-shrink-0" />
+                  <p className="text-xs sm:text-sm font-medium text-destructive">{error}</p>
                 </div>
               </div>
             )}
@@ -156,11 +156,11 @@ export default function LoginForm() {
               <div className="space-y-2">
                 <Label 
                   htmlFor="email"
-                  className={cn(errors.email ? "text-[#EF4444]" : "text-[#1B1F3B]")}
+                  className={cn(errors.email ? "text-destructive" : "")}
                 >
                   Email
                 </Label>
-                <WhiteInput
+                <Input
                   id="email"
                   type="email"
                   autoComplete="email"
@@ -168,25 +168,25 @@ export default function LoginForm() {
                   placeholder="seu.email@exemplo.com"
                   {...register("email")}
                   className={cn(
-                    errors.email ? "border-[#EF4444] ring-[#EF4444]/20" : "border-[#E2E8F0]",
-                    "focus-visible:ring-[#3A86FF]/20 text-[#1B1F3B]"
+                    errors.email ? "border-destructive" : "",
+                    "bg-background"
                   )}
                   aria-invalid={!!errors.email}
                 />
                 {errors.email && (
-                  <p className="text-sm text-[#EF4444]">{errors.email.message}</p>
+                  <p className="text-sm text-destructive">{errors.email.message}</p>
                 )}
               </div>
               
               <div className="space-y-2">
                 <Label 
                   htmlFor="password"
-                  className={cn(errors.password ? "text-[#EF4444]" : "text-[#1B1F3B]")}
+                  className={cn(errors.password ? "text-destructive" : "")}
                 >
                   Senha
                 </Label>
                 <div className="relative">
-                  <WhiteInput
+                  <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     autoComplete="current-password"
@@ -194,14 +194,14 @@ export default function LoginForm() {
                     placeholder="••••••••"
                     {...register("password")}
                     className={cn(
-                      errors.password ? "border-[#EF4444] ring-[#EF4444]/20" : "border-[#E2E8F0]",
-                      "focus-visible:ring-[#3A86FF]/20 pr-10 text-[#1B1F3B]"
+                      errors.password ? "border-destructive" : "",
+                      "bg-background pr-10"
                     )}
                     aria-invalid={!!errors.password}
                   />
                   <button 
                     type="button"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6C7086] hover:text-[#1B1F3B]"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     onClick={togglePasswordVisibility}
                     aria-label={showPassword ? "Esconder senha" : "Mostrar senha"}
                   >
@@ -213,47 +213,47 @@ export default function LoginForm() {
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="text-sm text-[#EF4444]">{errors.password.message}</p>
+                  <p className="text-sm text-destructive">{errors.password.message}</p>
                 )}
               </div>
             </div>
 
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Checkbox id="remember-me" className="border-[#E2E8F0] text-[#3A86FF] data-[state=checked]:bg-[#3A86FF] data-[state=checked]:text-white" />
+              <div className="flex items-center space-x-2">
+                <Checkbox id="remember" />
                 <Label
-                  htmlFor="remember-me"
-                  className="text-xs sm:text-sm text-[#6C7086]"
+                  htmlFor="remember"
+                  className="text-sm text-muted-foreground"
                 >
                   Lembrar-me
                 </Label>
               </div>
 
-              <a
-                href="#"
-                className="text-xs sm:text-sm font-medium text-[#3A86FF] hover:text-[#3A86FF]/90 transition-colors"
+              <Button
+                variant="link"
+                className="text-xs sm:text-sm font-medium px-0"
               >
                 Esqueceu a senha?
-              </a>
+              </Button>
             </div>
             
             <Button
               type="submit"
-              className="w-full py-2.5 rounded-xl bg-[#3A86FF] text-white hover:bg-[#3A86FF]/90"
+              className="w-full"
               disabled={isFormDisabled || formSubmitting}
             >
               {formSubmitting ? "Entrando..." : (isFormDisabled ? "Bloqueado" : "Entrar")}
             </Button>
             
-            <p className="text-center text-xs text-[#6C7086]">
+            <p className="text-center text-xs text-muted-foreground">
               Ao fazer login, você concorda com nossos{" "}
-              <a href="#" className="text-[#3A86FF] hover:underline">
+              <Button variant="link" className="text-xs p-0 h-auto">
                 Termos de Uso
-              </a>{" "}
+              </Button>{" "}
               e{" "}
-              <a href="#" className="text-[#3A86FF] hover:underline">
+              <Button variant="link" className="text-xs p-0 h-auto">
                 Política de Privacidade
-              </a>
+              </Button>
               .
             </p>
           </form>
