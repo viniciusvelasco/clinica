@@ -1,5 +1,6 @@
 @import "tailwindcss";
-@import "tw-animate-css";
+
+@plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -44,74 +45,74 @@
 }
 
 :root {
-  --radius: 0.5rem;
-  --background: 0 0% 97%;
-  --foreground: 232 37% 17%;
-  --card: 0 0% 97%;
-  --card-foreground: 232 37% 17%;
-  --popover: 0 0% 97%;
-  --popover-foreground: 232 37% 17%;
-  --primary: 217 100% 61%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 231 83% 60%;
-  --secondary-foreground: 0 0% 100%;
-  --muted: 232 37% 17%;
-  --muted-foreground: 232 37% 45%;
-  --accent: 43 100% 70%;
-  --accent-foreground: 232 37% 17%;
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-  --ring: 231 83% 60%;
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --radius: 0.625rem;
+  /* Modo Claro */
+  --background: #F8F9FA;
+  --foreground: #1B1F3B;
+  --card: #F8F9FA;
+  --card-foreground: #1B1F3B;
+  --popover: #F8F9FA;
+  --popover-foreground: #1B1F3B;
+  --primary: #3A86FF;
+  --primary-foreground: #F8F9FA;
+  --secondary: #4361EE;
+  --secondary-foreground: #F8F9FA;
+  --muted: #F0F1F5;
+  --muted-foreground: #6C7086;
+  --accent: #FFD166;
+  --accent-foreground: #1B1F3B;
+  --destructive: #EF4444;
+  --border: #E2E8F0;
+  --input: #E2E8F0;
+  --ring: #3A86FF;
+  --chart-1: #3A86FF;
+  --chart-2: #4361EE;
+  --chart-3: #FFD166;
+  --chart-4: #3a86ff80;
+  --chart-5: #4361ee80;
+  --sidebar: #F8F9FA;
+  --sidebar-foreground: #1B1F3B;
+  --sidebar-primary: #3A86FF;
+  --sidebar-primary-foreground: #F8F9FA;
+  --sidebar-accent: #FFD166;
+  --sidebar-accent-foreground: #1B1F3B;
+  --sidebar-border: #E2E8F0;
+  --sidebar-ring: #3A86FF;
 }
 
 .dark {
-  --background: 232 37% 17%;
-  --foreground: 0 0% 97%;
-  --card: 232 37% 17%;
-  --card-foreground: 0 0% 97%;
-  --popover: 232 37% 17%;
-  --popover-foreground: 0 0% 97%;
-  --primary: 231 83% 60%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 217 100% 61%;
-  --secondary-foreground: 0 0% 100%;
-  --muted: 0 0% 97%;
-  --muted-foreground: 0 0% 75%;
-  --accent: 43 100% 70%;
-  --accent-foreground: 232 37% 17%;
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 232 37% 25%;
-  --input: 232 37% 25%;
-  --ring: 231 83% 60%;
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Modo Escuro */
+  --background: #1B1F3B;
+  --foreground: #F8F9FA;
+  --card: #252A48;
+  --card-foreground: #F8F9FA;
+  --popover: #252A48;
+  --popover-foreground: #F8F9FA;
+  --primary: #4361EE;
+  --primary-foreground: #F8F9FA;
+  --secondary: #3A86FF;
+  --secondary-foreground: #F8F9FA;
+  --muted: #252A48;
+  --muted-foreground: #9CA3AF;
+  --accent: #FFD166;
+  --accent-foreground: #1B1F3B;
+  --destructive: #FF4747;
+  --border: #313759;
+  --input: #313759;
+  --ring: #4361EE;
+  --chart-1: #4361EE;
+  --chart-2: #3A86FF;
+  --chart-3: #FFD166;
+  --chart-4: #4361ee80;
+  --chart-5: #3a86ff80;
+  --sidebar: #252A48;
+  --sidebar-foreground: #F8F9FA;
+  --sidebar-primary: #4361EE;
+  --sidebar-primary-foreground: #F8F9FA;
+  --sidebar-accent: #FFD166;
+  --sidebar-accent-foreground: #1B1F3B;
+  --sidebar-border: #313759;
+  --sidebar-ring: #4361EE;
 }
 
 @layer base {
