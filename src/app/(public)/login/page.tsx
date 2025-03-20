@@ -46,37 +46,51 @@ export default function LoginPage() {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/95 via-primary/70 to-transparent" />
         </div>
-        <div className="relative z-10 p-12 max-w-2xl">
-          <h1 className="text-4xl font-bold text-white mb-4">
-            {process.env.NEXT_PUBLIC_SYSTEM_NAME}
-          </h1>
-          <p className="text-xl text-white/90 mb-8">
-            Gestão inteligente para sua clínica médica
-          </p>
-          <div className="grid grid-cols-2 gap-8 text-white/80">
-            <div className="space-y-2">
-              <div className="text-2xl font-bold">+1000</div>
-              <div className="text-sm">Pacientes Atendidos</div>
+        <div className="relative z-10 flex flex-col justify-center h-full p-16 max-w-3xl">
+          <div className="space-y-8">
+            <div>
+              <h1 className="text-5xl font-bold text-white mb-6">
+                {process.env.NEXT_PUBLIC_SYSTEM_NAME}
+              </h1>
+              <p className="text-2xl text-white/90">
+                Transformando a gestão da sua clínica com tecnologia e inovação
+              </p>
             </div>
-            <div className="space-y-2">
-              <div className="text-2xl font-bold">98%</div>
-              <div className="text-sm">Satisfação</div>
+            
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 space-y-6">
+              <p className="text-lg text-white/90">
+                Simplifique processos, otimize agendamentos e melhore a experiência dos seus pacientes com nossa solução completa.
+              </p>
+              <div className="grid grid-cols-3 gap-8">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-white">+1000</div>
+                  <div className="text-sm text-white/80 mt-1">Pacientes Atendidos</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-white">98%</div>
+                  <div className="text-sm text-white/80 mt-1">Satisfação</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-white">-30%</div>
+                  <div className="text-sm text-white/80 mt-1">Tempo de Espera</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Lado direito - Formulário de Login */}
-      <div className="w-full lg:w-[30%] flex items-center justify-center p-8">
+      <div className="w-full lg:w-[30%] flex items-center justify-center p-8 bg-background">
         <div className="w-full max-w-md space-y-8">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Bem-vindo de volta
+            <h2 className="text-2xl font-bold text-foreground">
+              Acesso ao Sistema
             </h2>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              Faça login para acessar o sistema
+            <p className="mt-2 text-sm text-muted-foreground">
+              Entre com suas credenciais para continuar
             </p>
           </div>
 
@@ -91,7 +105,7 @@ export default function LoginPage() {
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  className="block text-sm font-medium text-foreground"
                 >
                   Email
                 </label>
@@ -101,14 +115,14 @@ export default function LoginPage() {
                   type="email"
                   autoComplete="email"
                   required
-                  className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                  className="mt-1 block w-full px-3 py-2 bg-background border border-input rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="password"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  className="block text-sm font-medium text-foreground"
                 >
                   Senha
                 </label>
@@ -118,7 +132,7 @@ export default function LoginPage() {
                   type="password"
                   autoComplete="current-password"
                   required
-                  className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                  className="mt-1 block w-full px-3 py-2 bg-background border border-input rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                 />
               </div>
             </div>
