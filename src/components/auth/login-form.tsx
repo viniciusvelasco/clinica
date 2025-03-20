@@ -12,6 +12,59 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ExclamationTriangleIcon, EyeOpenIcon, EyeClosedIcon } from "@radix-ui/react-icons";
 import { cn } from "@/lib/utils";
+import { FormEvent } from "react";
+
+interface LoginFormProps {
+  onSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>;
+  error: string | null;
+}
+
+export const LoginForm = ({ onSubmit, error }: LoginFormProps) => {
+  return (
+    <div className="flex flex-col justify-center min-h-screen p-8">
+      <div className="mx-auto w-full max-w-sm space-y-6">
+        <div className="space-y-2 text-center">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Acesso ao Sistema
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Entre com suas credenciais
+          </p>
+        </div>
+
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">E-mail</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="seu@email.com"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Senha</Label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              required
+            />
+          </div>
+
+          {error && (
+            <div className="text-sm text-red-500 text-center">{error}</div>
+          )}
+
+          <Button type="submit" className="w-full">
+            Entrar
+          </Button>
+        </form>
+      </div>
+    </div>
+  );
+};
 
 export default function LoginForm() {
   const router = useRouter();

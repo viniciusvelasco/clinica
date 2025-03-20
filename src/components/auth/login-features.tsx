@@ -1,7 +1,7 @@
-import React from 'react';
+import { ReactNode } from "react";
 
 export interface Feature {
-  icon: JSX.Element;
+  icon: ReactNode;
   title: string;
   description: string;
 }
