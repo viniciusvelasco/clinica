@@ -38,8 +38,20 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen">
-      <LoginBanner />
-      <div className="flex flex-1 items-center justify-center">
+      {/* Área principal (70%) */}
+      <div className="hidden lg:flex lg:w-[70%] relative overflow-hidden">
+        <Image
+          src="/images/medical-team.jpg"
+          alt="Equipe médica"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/95 via-primary/70 to-transparent" />
+      </div>
+
+      {/* Área de login (30%) */}
+      <div className="w-full lg:w-[30%] bg-background">
         <LoginForm />
       </div>
     </div>
