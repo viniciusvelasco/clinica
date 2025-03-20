@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import React from "react";
-import { features } from "./login-features";
+import { features, Feature } from "./login-features";
 
 export function LoginBanner() {
   const systemName = process.env.NEXT_PUBLIC_SYSTEM_NAME || "Sistema Médico";
@@ -12,13 +12,13 @@ export function LoginBanner() {
       {/* Imagem de fundo com overlay */}
       <div className="absolute inset-0">
         <Image
-          src="/images/doctors-team.jpg"
+          src="/images/medical-banner.jpg"
           alt="Equipe médica"
           fill
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/95 via-primary/70 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/75 via-primary/90 to-transparent" />
       </div>
 
       {/* Conteúdo sobreposto */}
@@ -31,7 +31,7 @@ export function LoginBanner() {
           atendimento de qualidade aos seus pacientes.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 mt-8 lg:mt-12">
-          {features.map((feature, index) => (
+          {features.map((feature: Feature, index: number) => (
             <div key={index} className="text-center">
               <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm mb-2 lg:mb-3 mx-auto w-12 h-12 lg:w-14 lg:h-14 flex items-center justify-center">
                 {feature.icon}

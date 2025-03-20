@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface Feature {
+export interface Feature {
   icon: JSX.Element;
   title: string;
   description: string;
