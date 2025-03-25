@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
 import { getUserLanguage } from "@/actions/user";
 import { useLanguage } from "@/contexts/language-context";
 import { LanguageModal } from "@/components/language-modal";
+import { useSession } from "next-auth/react";
 
 export default function Dashboard() {
   const { data: session } = useSession();

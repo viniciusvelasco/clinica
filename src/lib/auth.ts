@@ -4,10 +4,10 @@ import type { NextAuthConfig } from "next-auth";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/db";
 
 export const authConfig = {
-  adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(db),
   session: {
     strategy: "jwt",
   },
@@ -26,7 +26,7 @@ export const authConfig = {
           return null;
         }
 
-        const user = await prisma.user.findUnique({
+        const user = await db.user.findUnique({
           where: {
             email: credentials.email,
           },
@@ -65,7 +65,7 @@ export const authConfig = {
     async jwt({ token }) {
       if (!token.sub) return token;
 
-      const existingUser = await prisma.user.findUnique({
+      const existingUser = await db.user.findUnique({
         where: {
           id: token.sub,
         },
