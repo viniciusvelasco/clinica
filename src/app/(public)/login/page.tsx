@@ -5,6 +5,15 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { 
+  Calendar, 
+  ClipboardList, 
+  BarChart3, 
+  CreditCard,
+  Shield,
+  Clock,
+  Users
+} from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -62,11 +71,21 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen bg-white">
       {/* Lado esquerdo - 70% */}
-      <div className="hidden md:flex md:w-[70%] bg-blue-50 flex-col items-center justify-center p-10 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-100/50 to-white/20" />
+      <div className="hidden md:flex md:w-[70%] flex-col items-center justify-center p-0 relative">
+        {/* Background image */}
+        <div className="absolute inset-0 w-full h-full">
+          <Image 
+            src="/images/medical-background.jpg" 
+            alt="Background" 
+            fill 
+            className="object-cover object-center"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-800/60 to-blue-600/40 backdrop-blur-sm" />
+        </div>
         
-        <div className="relative z-10 max-w-2xl mx-auto text-center">
-          <div className="w-32 h-32 mx-auto mb-6">
+        <div className="relative z-10 max-w-2xl mx-auto text-center px-6">
+          <div className="w-32 h-32 mx-auto mb-6 bg-white/20 backdrop-blur-md rounded-full p-5 shadow-xl">
             <img
               src="/medical-logo.svg"
               alt="Clínica Logo"
@@ -74,66 +93,111 @@ export default function LoginPage() {
             />
           </div>
           
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 drop-shadow-lg">
             Sistema de Gestão Clínica
           </h1>
           
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="text-xl text-white/90 mb-8 drop-shadow">
             Simplifique o atendimento e potencialize seus resultados
           </p>
           
-          <div className="bg-white/80 backdrop-blur-sm rounded-lg p-6 mt-8">
-            <h2 className="text-2xl font-bold text-primary mb-3">
+          <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 shadow-2xl border border-white/20">
+            <h2 className="text-2xl font-bold text-white mb-6 drop-shadow-md">
               Tudo o que você precisa em um só lugar
             </h2>
-            <ul className="text-gray-700 text-left space-y-2">
-              <li className="flex items-center">
-                <svg className="w-5 h-5 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                Agendamento inteligente de consultas
-              </li>
-              <li className="flex items-center">
-                <svg className="w-5 h-5 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                Prontuário eletrônico completo
-              </li>
-              <li className="flex items-center">
-                <svg className="w-5 h-5 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                Gestão financeira e faturamento
-              </li>
-              <li className="flex items-center">
-                <svg className="w-5 h-5 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                Relatórios e análises detalhados
-              </li>
-            </ul>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-white">
+              <div className="flex items-start space-x-3">
+                <Calendar className="w-6 h-6 text-blue-100 mt-0.5 flex-shrink-0" strokeWidth={2} />
+                <div>
+                  <h3 className="font-semibold mb-1">Agendamento Inteligente</h3>
+                  <p className="text-sm text-blue-100/90">Gerenciamento de consultas sem conflitos</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-3">
+                <ClipboardList className="w-6 h-6 text-blue-100 mt-0.5 flex-shrink-0" strokeWidth={2} />
+                <div>
+                  <h3 className="font-semibold mb-1">Prontuário Eletrônico</h3>
+                  <p className="text-sm text-blue-100/90">Histórico completo e acessível</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-3">
+                <CreditCard className="w-6 h-6 text-blue-100 mt-0.5 flex-shrink-0" strokeWidth={2} />
+                <div>
+                  <h3 className="font-semibold mb-1">Gestão Financeira</h3>
+                  <p className="text-sm text-blue-100/90">Controle completo de receitas e despesas</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-3">
+                <BarChart3 className="w-6 h-6 text-blue-100 mt-0.5 flex-shrink-0" strokeWidth={2} />
+                <div>
+                  <h3 className="font-semibold mb-1">Relatórios Detalhados</h3>
+                  <p className="text-sm text-blue-100/90">Análises e insights para decisões</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-3">
+                <Clock className="w-6 h-6 text-blue-100 mt-0.5 flex-shrink-0" strokeWidth={2} />
+                <div>
+                  <h3 className="font-semibold mb-1">Otimização de Tempo</h3>
+                  <p className="text-sm text-blue-100/90">Automação de tarefas rotineiras</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-3">
+                <Users className="w-6 h-6 text-blue-100 mt-0.5 flex-shrink-0" strokeWidth={2} />
+                <div>
+                  <h3 className="font-semibold mb-1">Gestão de Pacientes</h3>
+                  <p className="text-sm text-blue-100/90">Acompanhamento completo e personalizado</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-8 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-blue-100 mr-2" />
+              <p className="text-sm text-blue-100">Dados protegidos com criptografia de ponta a ponta</p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Lado direito - 30% */}
-      <div className="w-full md:w-[30%] flex items-center justify-center p-4 md:p-10">
+      <div className="w-full md:w-[30%] flex items-center justify-center p-6 md:p-10">
         <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            {/* Logo em telas menores */}
-            <div className="w-20 h-20 mx-auto mb-4 md:hidden">
-              <img
-                src="/medical-logo.svg"
-                alt="Clínica Logo"
-                className="w-full h-full"
-              />
+          {/* Versão mobile do background e logo */}
+          <div className="md:hidden relative w-full h-40 mb-8 rounded-xl overflow-hidden">
+            <Image 
+              src="/images/medical-background.jpg" 
+              alt="Background" 
+              fill 
+              className="object-cover object-center"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-800/60 to-blue-600/40" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-full p-4 shadow-xl">
+                <img
+                  src="/medical-logo.svg"
+                  alt="Clínica Logo"
+                  className="w-full h-full"
+                />
+              </div>
             </div>
+          </div>
+
+          <div className="text-center mb-8">
             <h2 className="text-2xl font-bold">Acesse sua conta</h2>
             <p className="text-gray-500 mt-2">Insira suas credenciais para continuar</p>
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 p-3 rounded-md text-sm text-red-600 mb-4">
+            <div className="bg-red-50 border border-red-200 p-3 rounded-md text-sm text-red-600 mb-4 flex items-center">
+              <svg className="w-5 h-5 mr-2 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
               {error}
             </div>
           )}
@@ -151,7 +215,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 autoComplete="email"
                 required
-                className="block w-full rounded-md border border-gray-300 px-4 py-2 text-gray-900 focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
+                className="block w-full rounded-md border border-gray-300 px-4 py-2.5 text-gray-900 focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
                 placeholder="seu@email.com"
               />
             </div>
@@ -173,7 +237,7 @@ export default function LoginPage() {
                 type="password"
                 autoComplete="current-password"
                 required
-                className="block w-full rounded-md border border-gray-300 px-4 py-2 text-gray-900 focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
+                className="block w-full rounded-md border border-gray-300 px-4 py-2.5 text-gray-900 focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
                 placeholder="••••••••"
               />
             </div>
@@ -194,7 +258,7 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              className="w-full bg-primary py-2.5"
+              className="w-full bg-primary hover:bg-primary/90 text-white py-2.5"
               disabled={isLoading}
             >
               {isLoading ? "Entrando..." : "Entrar"}
