@@ -12,7 +12,9 @@ import {
   CreditCard,
   Shield,
   Clock,
-  Users
+  Users,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { LanguageSelector } from "@/components/language-selector";
 import { LanguageModal } from "@/components/language-modal";
@@ -30,6 +32,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Carregar email do localStorage se existir
   useEffect(() => {
@@ -253,15 +256,28 @@ export default function LoginPage() {
                   </a>
                 </div>
               </div>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="block w-full rounded-md border border-gray-300 px-4 py-2.5 text-gray-900 focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
-                placeholder="••••••••"
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  required
+                  className="block w-full rounded-md border border-gray-300 px-4 py-2.5 text-gray-900 focus:border-primary focus:outline-none focus:ring-primary sm:text-sm pr-10"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center">

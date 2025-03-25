@@ -123,3 +123,22 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Esconder o ícone de revelar senha do navegador */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input[type="password"]::-webkit-contacts-auto-fill-button {
+  display: none !important;
+}
+
+/* Para Chrome/Edge */
+input::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  position: absolute;
+  right: 0;
+}
+
+/* Para Firefox */
+input[type="password"] {
+  -webkit-text-security: disc !important;
+}
