@@ -48,6 +48,7 @@ model User {
   password      String?
   image         String?
   role          String?   @default("user")
+  language      String?   @default("pt-BR")
   accounts      Account[]
   sessions      Session[]
 }

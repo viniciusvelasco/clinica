@@ -14,13 +14,22 @@ import {
   Clock,
   Users
 } from "lucide-react";
+import { LanguageSelector } from "@/components/language-selector";
+import { LanguageModal } from "@/components/language-modal";
+import { useLanguage } from "@/contexts/language-context";
+import { useTranslate } from "@/hooks/use-translate";
+import { updateUserLanguage } from "@/actions/user";
+import 'flag-icons/css/flag-icons.min.css';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { language } = useLanguage();
+  const { t } = useTranslate();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
 
   // Carregar email do localStorage se existir
   useEffect(() => {
@@ -55,21 +64,34 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        setError("Credenciais inválidas");
+        setError(t('login.error.invalid_credentials'));
         setIsLoading(false);
         return;
       }
 
+      // Guardar idioma preferido do usuário
+      await updateUserLanguage(language);
+      
       router.push("/dashboard");
       router.refresh();
     } catch (error) {
-      setError("Ocorreu um erro ao fazer login");
+      setError(t('login.error.generic'));
       setIsLoading(false);
     }
   };
 
+  const handleLanguageSelected = async (selectedLanguage: string) => {
+    setShowLanguageModal(false);
+  };
+
   return (
     <div className="flex min-h-screen bg-white">
+      {/* Modal de seleção de idioma */}
+      <LanguageModal 
+        isOpen={showLanguageModal} 
+        onClose={handleLanguageSelected} 
+      />
+
       {/* Lado esquerdo - 70% */}
       <div className="hidden md:flex md:w-[70%] flex-col items-center justify-center p-0 relative">
         {/* Background image */}
@@ -94,71 +116,71 @@ export default function LoginPage() {
           </div>
           
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 drop-shadow-lg">
-            Sistema de Gestão Clínica
+            {t('marketing.title')}
           </h1>
           
           <p className="text-xl text-white/90 mb-8 drop-shadow">
-            Simplifique o atendimento e potencialize seus resultados
+            {t('marketing.subtitle')}
           </p>
           
           <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 shadow-2xl border border-white/20">
             <h2 className="text-2xl font-bold text-white mb-6 drop-shadow-md">
-              Tudo o que você precisa em um só lugar
+              {t('marketing.card_title')}
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-white">
               <div className="flex items-start space-x-3">
                 <Calendar className="w-6 h-6 text-blue-100 mt-0.5 flex-shrink-0" strokeWidth={2} />
                 <div>
-                  <h3 className="font-semibold mb-1">Agendamento Inteligente</h3>
-                  <p className="text-sm text-blue-100/90">Gerenciamento de consultas sem conflitos</p>
+                  <h3 className="font-semibold mb-1">{t('marketing.scheduling')}</h3>
+                  <p className="text-sm text-blue-100/90">{t('marketing.scheduling_desc')}</p>
                 </div>
               </div>
               
               <div className="flex items-start space-x-3">
                 <ClipboardList className="w-6 h-6 text-blue-100 mt-0.5 flex-shrink-0" strokeWidth={2} />
                 <div>
-                  <h3 className="font-semibold mb-1">Prontuário Eletrônico</h3>
-                  <p className="text-sm text-blue-100/90">Histórico completo e acessível</p>
+                  <h3 className="font-semibold mb-1">{t('marketing.medical_records')}</h3>
+                  <p className="text-sm text-blue-100/90">{t('marketing.medical_records_desc')}</p>
                 </div>
               </div>
               
               <div className="flex items-start space-x-3">
                 <CreditCard className="w-6 h-6 text-blue-100 mt-0.5 flex-shrink-0" strokeWidth={2} />
                 <div>
-                  <h3 className="font-semibold mb-1">Gestão Financeira</h3>
-                  <p className="text-sm text-blue-100/90">Controle completo de receitas e despesas</p>
+                  <h3 className="font-semibold mb-1">{t('marketing.financial')}</h3>
+                  <p className="text-sm text-blue-100/90">{t('marketing.financial_desc')}</p>
                 </div>
               </div>
               
               <div className="flex items-start space-x-3">
                 <BarChart3 className="w-6 h-6 text-blue-100 mt-0.5 flex-shrink-0" strokeWidth={2} />
                 <div>
-                  <h3 className="font-semibold mb-1">Relatórios Detalhados</h3>
-                  <p className="text-sm text-blue-100/90">Análises e insights para decisões</p>
+                  <h3 className="font-semibold mb-1">{t('marketing.reports')}</h3>
+                  <p className="text-sm text-blue-100/90">{t('marketing.reports_desc')}</p>
                 </div>
               </div>
               
               <div className="flex items-start space-x-3">
                 <Clock className="w-6 h-6 text-blue-100 mt-0.5 flex-shrink-0" strokeWidth={2} />
                 <div>
-                  <h3 className="font-semibold mb-1">Otimização de Tempo</h3>
-                  <p className="text-sm text-blue-100/90">Automação de tarefas rotineiras</p>
+                  <h3 className="font-semibold mb-1">{t('marketing.time')}</h3>
+                  <p className="text-sm text-blue-100/90">{t('marketing.time_desc')}</p>
                 </div>
               </div>
               
               <div className="flex items-start space-x-3">
                 <Users className="w-6 h-6 text-blue-100 mt-0.5 flex-shrink-0" strokeWidth={2} />
                 <div>
-                  <h3 className="font-semibold mb-1">Gestão de Pacientes</h3>
-                  <p className="text-sm text-blue-100/90">Acompanhamento completo e personalizado</p>
+                  <h3 className="font-semibold mb-1">{t('marketing.patients')}</h3>
+                  <p className="text-sm text-blue-100/90">{t('marketing.patients_desc')}</p>
                 </div>
               </div>
             </div>
             
             <div className="mt-8 flex items-center justify-center">
               <Shield className="w-5 h-5 text-blue-100 mr-2" />
-              <p className="text-sm text-blue-100">Dados protegidos com criptografia de ponta a ponta</p>
+              <p className="text-sm text-blue-100">{t('marketing.security')}</p>
             </div>
           </div>
         </div>
@@ -189,8 +211,8 @@ export default function LoginPage() {
           </div>
 
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold">Acesse sua conta</h2>
-            <p className="text-gray-500 mt-2">Insira suas credenciais para continuar</p>
+            <h2 className="text-2xl font-bold">{t('login.title')}</h2>
+            <p className="text-gray-500 mt-2">{t('login.subtitle')}</p>
           </div>
 
           {error && (
@@ -205,7 +227,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email
+                {t('login.email')}
               </label>
               <input
                 id="email"
@@ -223,11 +245,11 @@ export default function LoginPage() {
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                  Senha
+                  {t('login.password')}
                 </label>
                 <div className="text-sm">
                   <a href="#" className="font-medium text-primary hover:text-primary/80">
-                    Esqueceu a senha?
+                    {t('login.forgot_password')}
                   </a>
                 </div>
               </div>
@@ -252,7 +274,7 @@ export default function LoginPage() {
                 className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
               />
               <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                Lembrar meu email
+                {t('login.remember_me')}
               </label>
             </div>
 
@@ -261,15 +283,18 @@ export default function LoginPage() {
               className="w-full bg-primary hover:bg-primary/90 text-white py-2.5"
               disabled={isLoading}
             >
-              {isLoading ? "Entrando..." : "Entrar"}
+              {isLoading ? t('login.loading') : t('login.submit')}
             </Button>
             
             <div className="mt-4 text-center text-xs text-gray-500">
-              Ao acessar, você concorda com nossos
+              {t('login.terms')}
               <a href="/politica-privacidade" className="text-primary hover:text-primary/80 mx-1">
                 Termos de Uso e Política de Privacidade
               </a>
             </div>
+            
+            {/* Selector de idiomas */}
+            <LanguageSelector />
           </form>
         </div>
       </div>

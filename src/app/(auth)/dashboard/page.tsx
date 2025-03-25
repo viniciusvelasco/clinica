@@ -1,10 +1,60 @@
-import { auth } from "@/lib/auth";
+"use client";
 
-export default async function DashboardPage() {
-  const session = await auth();
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { getUserLanguage } from "@/actions/user";
+import { useLanguage } from "@/contexts/language-context";
+import { LanguageModal } from "@/components/language-modal";
+
+export default function Dashboard() {
+  const { data: session } = useSession();
+  const { language, setLanguage } = useLanguage();
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkUserLanguage = async () => {
+      try {
+        setLoading(true);
+        // Verificar se o usuário tem idioma configurado
+        const { language: userLanguage } = await getUserLanguage();
+        
+        // Se o usuário não tiver idioma, mostrar modal para selecionar
+        if (!userLanguage) {
+          setShowLanguageModal(true);
+        } else {
+          // Se tiver, definir o idioma da aplicação
+          setLanguage(userLanguage as any);
+        }
+      } catch (error) {
+        console.error("Erro ao verificar idioma do usuário:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkUserLanguage();
+  }, [setLanguage]);
+
+  const handleLanguageSelected = async (selectedLanguage: string) => {
+    setShowLanguageModal(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="container py-8">
+      <LanguageModal 
+        isOpen={showLanguageModal} 
+        onClose={handleLanguageSelected} 
+      />
+      
       <h1 className="mb-4 text-3xl font-bold">Dashboard</h1>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
@@ -113,6 +163,7 @@ export default async function DashboardPage() {
           Esta é sua área administrativa. A partir daqui você pode gerenciar todas as 
           funções da clínica.
         </p>
+        <p>Seu idioma atual é: {language}</p>
       </div>
     </div>
   );
