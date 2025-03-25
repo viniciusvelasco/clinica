@@ -9,55 +9,53 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model Usuario {
-  id        Int      @id @default(autoincrement())
-  nome      String
-  email     String   @unique
-  senha     String
-  papel     String   @default("usuario") // "admin" ou "usuario"
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
 }
 
-model Paciente {
-  id            Int       @id @default(autoincrement())
-  nome          String
-  cpf           String    @unique
-  dataNascimento DateTime
-  telefone      String?
-  email         String?
-  endereco      String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  consultas     Consulta[]
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Medico {
-  id            Int       @id @default(autoincrement())
-  nome          String
-  especialidade String
-  crm           String    @unique
-  telefone      String?
-  email         String    @unique
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  consultas     Consulta[]
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  password      String?
+  image         String?
+  role          String?   @default("user")
+  accounts      Account[]
+  sessions      Session[]
 }
 
-model Consulta {
-  id            Int       @id @default(autoincrement())
-  data          DateTime
-  status        String    @default("agendada") // "agendada", "realizada", "cancelada"
-  observacoes   String?
-  pacienteId    Int
-  medicoId      Int
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  
-  paciente      Paciente  @relation(fields: [pacienteId], references: [id])
-  medico        Medico    @relation(fields: [medicoId], references: [id])
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }

@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/mode-toggle";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -12,8 +13,12 @@ export default function Home() {
           Sistema de gerenciamento de clínica com Next.js, Tailwind CSS, shadcn/ui e Prisma ORM
         </p>
         <div className="flex flex-col sm:flex-row items-center gap-4">
-          <Button>Botão Primário</Button>
-          <Button variant="secondary">Botão Secundário</Button>
+          <Button asChild>
+            <Link href="/login">Entrar</Link>
+          </Button>
+          <Button variant="secondary" asChild>
+            <Link href="/dashboard">Dashboard</Link>
+          </Button>
           <ModeToggle />
         </div>
       </div>
