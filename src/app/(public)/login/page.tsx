@@ -263,6 +263,13 @@ export default function LoginPage() {
             >
               {isLoading ? "Entrando..." : "Entrar"}
             </Button>
+            
+            <div className="mt-4 text-center text-xs text-gray-500">
+              Ao acessar, você concorda com nossos
+              <a href="/politica-privacidade" className="text-primary hover:text-primary/80 mx-1">
+                Termos de Uso e Política de Privacidade
+              </a>
+            </div>
           </form>
         </div>
       </div>
