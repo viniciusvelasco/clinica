@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
+import { Footer } from "@/components/footer";
+import { handleSignOut } from "@/lib/actions";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -19,9 +21,12 @@ export default async function AuthLayout({ children }: AuthLayoutProps) {
       <Header />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <main className="flex-1 overflow-y-auto p-4">
-          {children}
-        </main>
+        <div className="flex flex-col flex-1">
+          <main className="flex-1 overflow-y-auto p-4">
+            {children}
+          </main>
+          <Footer />
+        </div>
       </div>
     </div>
   );

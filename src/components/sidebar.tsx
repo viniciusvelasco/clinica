@@ -224,22 +224,18 @@ export function Sidebar({ className }: SidebarProps) {
         )}
       </nav>
       
-      {/* Botão de Collapse posicionado no canto inferior */}
-      <div className="absolute bottom-4 right-0">
+      {/* Botão de Collapse centralizado na borda lateral */}
+      <div className="absolute top-1/2 -translate-y-1/2 -right-3.5 z-10">
         <Button
-          variant="ghost"
+          variant="outline"
           size="icon"
           className={cn(
-            "h-8 w-5 rounded-l-md flex items-center justify-center transition-all",
-            isCollapsed ? "bg-muted/80" : "bg-muted/50 hover:bg-muted/80"
+            "h-7 w-7 rounded-full border border-border bg-background shadow-md",
+            isCollapsed ? "rotate-180" : ""
           )}
           onClick={() => setIsCollapsed(!isCollapsed)}
         >
-          {isCollapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <ChevronLeft className="h-4 w-4" />
-          )}
+          <ChevronLeft className="h-4 w-4" />
         </Button>
       </div>
     </div>
