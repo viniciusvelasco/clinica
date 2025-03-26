@@ -12,6 +12,7 @@ export const authConfig = {
   session: {
     strategy: "jwt",
   },
+  debug: true,
   pages: {
     signIn: "/login",
   },
@@ -26,7 +27,7 @@ export const authConfig = {
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
-
+        console.log("Autenticando usuário");
         const email = credentials.email as string;
         const password = credentials.password as string;
 
