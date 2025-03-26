@@ -195,8 +195,8 @@ export default function PerfilPage() {
   }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <h1 className="text-2xl font-bold">Meu Perfil</h1>
+    <div className="container mx-auto">
+      <h1 className="text-2xl font-bold mb-6">Meu Perfil</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Coluna da esquerda - Foto */}

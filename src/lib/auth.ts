@@ -40,14 +40,6 @@ export const authConfig = {
 
         if (!isPasswordValid) return null;
 
-        // Registrar histórico de login
-        await db.historicoLogin.create({
-          data: {
-            userId: user.id,
-            timestamp: new Date(),
-          },
-        });
-
         return {
           id: user.id,
           email: user.email || "",
@@ -90,31 +82,30 @@ export const authConfig = {
 
 export const { handlers, auth, signOut } = NextAuth(authConfig);
 
-export const signIn = async (credentials: { email: string; password: string }) => {
+export const signIn = async (credentials: { email: string; password: string }, req?: Request) => {
   try {
     const result = await nextAuthSignIn("credentials", {
       ...credentials,
       redirect: false,
     });
 
-    // Registrar acesso após login bem-sucedido
     if (result?.ok && !result?.error) {
-      // Obter o usuário atual
       const session = await auth();
       
       if (session?.user?.id) {
-        // Registrar acesso
         try {
-          await fetch('/api/auth/acesso', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ userId: session.user.id }),
+          // Registrar histórico de acesso
+          await db.historicoAcesso.create({
+            data: {
+              userId: session.user.id,
+              dataHora: new Date(),
+              ip: req?.headers?.get('x-forwarded-for') || 'Desconhecido',
+              browser: req?.headers?.get('user-agent') || 'Desconhecido',
+              local: 'Brasil'
+            }
           });
         } catch (error) {
           console.error('Erro ao registrar acesso:', error);
-          // Não interromper o fluxo de login se o registro de acesso falhar
         }
       }
     }
