@@ -201,7 +201,7 @@ export default function PerfilPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Coluna da esquerda - Foto */}
         <Card className="border-primary/10">
-          <CardHeader className="bg-primary/5 pb-4 rounded-t-lg">
+          <CardHeader className="bg-primary/10 p-4 rounded-t-lg">
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5 text-primary" />
               Foto de Perfil
@@ -246,25 +246,25 @@ export default function PerfilPage() {
         
         {/* Coluna central - Tabs para Dados e Senha */}
         <Card className="md:col-span-2 border-primary/10">
-          <CardHeader className="bg-primary/5 pb-4 rounded-t-lg">
+          <CardHeader className="bg-primary/10 p-4 rounded-t-lg">
             <CardTitle>Dados pessoais</CardTitle>
             <CardDescription>Altere seus dados ou senha de acesso</CardDescription>
           </CardHeader>
           <CardContent className="pt-6">
             <Tabs defaultValue="dados" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6 p-1 bg-muted/80 rounded-lg">
+              <TabsList className="grid w-full grid-cols-2 mb-6 bg-muted rounded-lg">
                 <TabsTrigger 
                   value="dados" 
-                  className="rounded-md data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:font-medium flex items-center justify-center py-2.5 gap-2"
+                  className="rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:font-medium flex items-center justify-center py-3 gap-2"
                 >
-                  <UserCircle className="h-4 w-4" />
+                  <UserCircle className="h-5 w-5" />
                   Dados
                 </TabsTrigger>
                 <TabsTrigger 
                   value="senha" 
-                  className="rounded-md data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:font-medium flex items-center justify-center py-2.5 gap-2"
+                  className="rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:font-medium flex items-center justify-center py-3 gap-2"
                 >
-                  <ShieldAlert className="h-4 w-4" />
+                  <ShieldAlert className="h-5 w-5" />
                   Senha
                 </TabsTrigger>
               </TabsList>
@@ -372,7 +372,7 @@ export default function PerfilPage() {
         
         {/* Terceira coluna - Histórico de acessos (ocupa toda a largura em telas maiores) */}
         <Card className="md:col-span-3 border-primary/10">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 bg-primary/5 rounded-t-lg">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 bg-primary/10 p-4 rounded-t-lg">
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Clock className="h-5 w-5 text-primary" />
