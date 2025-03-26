@@ -3,6 +3,7 @@ import { compare } from "bcryptjs";
 import type { NextAuthConfig } from "next-auth";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { signIn as nextAuthSignIn } from "next-auth/react";
 
 import { db } from "@/lib/db";
 
@@ -79,4 +80,40 @@ export const authConfig = {
   },
 } satisfies NextAuthConfig;
 
-export const { handlers, auth, signIn, signOut } = NextAuth(authConfig); 
+export const { handlers, auth, signOut } = NextAuth(authConfig);
+
+export const signIn = async (credentials: { email: string; password: string }) => {
+  try {
+    const result = await nextAuthSignIn("credentials", {
+      ...credentials,
+      redirect: false,
+    });
+
+    // Registrar acesso após login bem-sucedido
+    if (result?.ok && !result?.error) {
+      // Obter o usuário atual
+      const session = await auth();
+      
+      if (session?.user?.id) {
+        // Registrar acesso
+        try {
+          await fetch('/api/auth/acesso', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId: session.user.id }),
+          });
+        } catch (error) {
+          console.error('Erro ao registrar acesso:', error);
+          // Não interromper o fluxo de login se o registro de acesso falhar
+        }
+      }
+    }
+
+    return result;
+  } catch (error) {
+    console.error("Erro ao fazer login:", error);
+    throw new Error("Falha na autenticação");
+  }
+}; 

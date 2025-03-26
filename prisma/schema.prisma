@@ -52,6 +52,7 @@ model User {
   language      String?   @default("pt-BR")
   accounts      Account[]
   sessions      Session[]
+  historicoAcessos HistoricoAcesso[]
 }
 
 model VerificationToken {
@@ -60,4 +61,18 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+// Modelo para histórico de acesso do usuário
+model HistoricoAcesso {
+  id       String   @id @default(cuid())
+  userId   String
+  dataHora DateTime
+  ip       String
+  browser  String
+  local    String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("historico_acessos")
 }

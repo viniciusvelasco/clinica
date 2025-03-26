@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,6 @@ import {
   Card, 
   CardContent, 
   CardDescription, 
-  CardFooter, 
   CardHeader, 
   CardTitle 
 } from "@/components/ui/card";
@@ -27,16 +26,18 @@ import {
   Upload,
   Save,
   Loader2,
+  RefreshCw,
 } from "lucide-react";
 import { toast } from "sonner";
+import { getInitials } from "@/lib/utils";
 
-// Mock de dados para histórico de acessos
-const acessosHistorico = [
-  { data: "2023-04-15T14:30:00", local: "São Paulo, SP", ip: "192.168.1.1", browser: "Chrome 112.0.5615.138" },
-  { data: "2023-04-14T09:15:00", local: "São Paulo, SP", ip: "192.168.1.1", browser: "Chrome 112.0.5615.138" },
-  { data: "2023-04-13T18:45:00", local: "Rio de Janeiro, RJ", ip: "200.145.12.98", browser: "Firefox 112.0" },
-  { data: "2023-04-10T11:20:00", local: "Brasília, DF", ip: "189.123.45.67", browser: "Safari 16.4" },
-];
+interface HistoricoAcesso {
+  id: string;
+  dataHora: string;
+  ip: string;
+  browser: string;
+  local: string;
+}
 
 export default function PerfilPage() {
   const { data: session, update } = useSession();
@@ -47,8 +48,38 @@ export default function PerfilPage() {
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingPhoto, setLoadingPhoto] = useState(false);
+  const [loadingHistorico, setLoadingHistorico] = useState(false);
   const [photo, setPhoto] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(session?.user?.image || null);
+  const [historicoAcessos, setHistoricoAcessos] = useState<HistoricoAcesso[]>([]);
+
+  // Buscar histórico de acessos
+  const buscarHistoricoAcessos = async () => {
+    if (!session?.user?.id) return;
+    
+    setLoadingHistorico(true);
+    
+    try {
+      const response = await fetch(`/api/auth/acesso?userId=${session.user.id}`);
+      const data = await response.json();
+      
+      if (data.historico) {
+        setHistoricoAcessos(data.historico);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar histórico de acesso:", error);
+      toast.error("Não foi possível carregar o histórico de acessos");
+    } finally {
+      setLoadingHistorico(false);
+    }
+  };
+
+  // Carregar histórico quando a página for montada
+  useEffect(() => {
+    if (session?.user?.id) {
+      buscarHistoricoAcessos();
+    }
+  }, [session?.user?.id]);
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -160,16 +191,6 @@ export default function PerfilPage() {
   if (!session?.user) {
     return <div>Carregando...</div>;
   }
-
-  const getInitials = (name: string | null | undefined) => {
-    if (!name) return "U";
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .substring(0, 2);
-  };
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -331,12 +352,23 @@ export default function PerfilPage() {
         
         {/* Terceira coluna - Histórico de acessos (ocupa toda a largura em telas maiores) */}
         <Card className="md:col-span-3">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5" />
-              Histórico de acessos
-            </CardTitle>
-            <CardDescription>Seus últimos acessos ao sistema</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="h-5 w-5" />
+                Histórico de acessos
+              </CardTitle>
+              <CardDescription>Seus últimos acessos ao sistema (horário em UTC)</CardDescription>
+            </div>
+            <Button 
+              variant="outline" 
+              size="icon" 
+              onClick={buscarHistoricoAcessos}
+              disabled={loadingHistorico}
+            >
+              <RefreshCw className={`h-4 w-4 ${loadingHistorico ? 'animate-spin' : ''}`} />
+              <span className="sr-only">Atualizar</span>
+            </Button>
           </CardHeader>
           <CardContent>
             <div className="rounded-md border">
@@ -350,14 +382,31 @@ export default function PerfilPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {acessosHistorico.map((acesso, index) => (
-                    <tr key={index} className="hover:bg-muted/50">
-                      <td className="px-4 py-3 text-sm">{formatarData(acesso.data)}</td>
-                      <td className="px-4 py-3 text-sm">{acesso.local}</td>
-                      <td className="px-4 py-3 text-sm">{acesso.ip}</td>
-                      <td className="px-4 py-3 text-sm">{acesso.browser}</td>
+                  {loadingHistorico ? (
+                    <tr>
+                      <td colSpan={4} className="px-4 py-6 text-center">
+                        <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+                        <span className="text-sm text-muted-foreground mt-2 block">
+                          Carregando histórico...
+                        </span>
+                      </td>
                     </tr>
-                  ))}
+                  ) : historicoAcessos.length > 0 ? (
+                    historicoAcessos.map((acesso) => (
+                      <tr key={acesso.id} className="hover:bg-muted/50">
+                        <td className="px-4 py-3 text-sm">{formatarData(acesso.dataHora)}</td>
+                        <td className="px-4 py-3 text-sm">{acesso.local}</td>
+                        <td className="px-4 py-3 text-sm">{acesso.ip}</td>
+                        <td className="px-4 py-3 text-sm">{acesso.browser}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="px-4 py-6 text-center text-muted-foreground">
+                        Nenhum registro de acesso encontrado.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
