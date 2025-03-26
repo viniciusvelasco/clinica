@@ -208,7 +208,7 @@ export default function PerfilPage() {
             </CardTitle>
             <CardDescription>Altere sua foto de perfil</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col items-center space-y-4 pt-6">
+          <CardContent className="flex flex-col items-center space-y-4">
             <Avatar className="h-32 w-32 border-4 border-primary/10 shadow-lg">
               <AvatarImage src={photoPreview || undefined} alt={session.user.name || ""} />
               <AvatarFallback className="text-2xl bg-primary/5">{getInitials(session.user.name)}</AvatarFallback>
@@ -250,7 +250,7 @@ export default function PerfilPage() {
             <CardTitle>Dados pessoais</CardTitle>
             <CardDescription>Altere seus dados ou senha de acesso</CardDescription>
           </CardHeader>
-          <CardContent className="pt-6">
+          <CardContent>
             <Tabs defaultValue="dados" className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-6 bg-muted rounded-lg">
                 <TabsTrigger 
@@ -391,7 +391,7 @@ export default function PerfilPage() {
               <span className="sr-only">Atualizar</span>
             </Button>
           </CardHeader>
-          <CardContent className="pt-6">
+          <CardContent>
             <div className="rounded-md border border-primary/10 overflow-hidden">
               <table className="min-w-full divide-y divide-border">
                 <thead>
