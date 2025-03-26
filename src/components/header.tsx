@@ -55,9 +55,9 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center">
+      <div className="container flex h-16 items-center px-2">
         {/* Logo e nome do sistema */}
-        <div className="flex items-center gap-3 px-4">
+        <div className="flex items-center gap-3">
           <Link href="/dashboard" className="flex items-center gap-3 transition-opacity hover:opacity-90">
             <Image
               src="/medical-logo.svg"
@@ -73,12 +73,12 @@ export function Header() {
         </div>
 
         {/* Ações do usuário */}
-        <div className="ml-auto flex items-center gap-3 px-4">
+        <div className="ml-auto flex items-center gap-2">
           {/* Botão de ajuda */}
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-10 w-10 hover:bg-muted">
-                <HelpCircle className="h-6 w-6 text-muted-foreground transition-colors hover:text-primary" />
+              <Button variant="ghost" size="icon" className="h-11 w-11 hover:bg-muted">
+                <HelpCircle className="h-7 w-7 text-muted-foreground transition-colors hover:text-primary" />
               </Button>
             </PopoverTrigger>
             <PopoverContent align="end" className="w-72">
@@ -102,8 +102,8 @@ export function Header() {
           {/* Notificações */}
           <Popover open={showNotifications} onOpenChange={setShowNotifications}>
             <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative h-10 w-10 hover:bg-muted">
-                <Bell className="h-6 w-6 text-muted-foreground transition-colors hover:text-primary" />
+              <Button variant="ghost" size="icon" className="relative h-11 w-11 hover:bg-muted">
+                <Bell className="h-7 w-7 text-muted-foreground transition-colors hover:text-primary" />
                 <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
                   3
                 </span>
@@ -122,14 +122,14 @@ export function Header() {
                   {notifications.map((notification) => (
                     <button
                       key={notification.id}
-                      className="w-full rounded-lg p-3 text-left transition-colors hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                      className="group w-full rounded-lg p-3 text-left transition-colors hover:bg-muted/80 active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                       onClick={() => {
                         // Aqui você pode adicionar a ação ao clicar na notificação
                         console.log('Notificação clicada:', notification.id);
                       }}
                     >
                       <div className="flex flex-col gap-1">
-                        <p className="text-sm font-medium leading-none">
+                        <p className="text-sm font-medium leading-none group-hover:text-primary transition-colors">
                           {notification.title}
                         </p>
                         <p className="text-sm text-muted-foreground">
@@ -143,7 +143,7 @@ export function Header() {
                   ))}
                 </div>
                 <Separator />
-                <Button variant="ghost" className="w-full justify-center">
+                <Button variant="ghost" className="w-full justify-center hover:bg-muted/80">
                   Ver todas
                 </Button>
               </div>
@@ -155,9 +155,9 @@ export function Header() {
             <PopoverTrigger asChild>
               <Button
                 variant="ghost"
-                className="relative h-10 w-10 rounded-full hover:bg-muted"
+                className="relative h-11 w-11 rounded-full hover:bg-muted"
               >
-                <Avatar className="h-9 w-9">
+                <Avatar className="h-10 w-10">
                   <AvatarImage
                     src={session?.user?.image || undefined}
                     alt={session?.user?.name || ""}
@@ -193,7 +193,7 @@ export function Header() {
                 <div className="space-y-1">
                   <Button
                     variant="ghost"
-                    className="w-full justify-start gap-2"
+                    className="w-full justify-start gap-2 hover:bg-muted/80"
                     asChild
                   >
                     <Link href="/perfil">
@@ -203,7 +203,7 @@ export function Header() {
                   </Button>
                   <Button
                     variant="ghost"
-                    className="w-full justify-start gap-2"
+                    className="w-full justify-start gap-2 hover:bg-muted/80"
                     asChild
                   >
                     <Link href="/configuracoes">
