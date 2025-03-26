@@ -27,6 +27,8 @@ import {
   Save,
   Loader2,
   RefreshCw,
+  UserCircle,
+  ShieldAlert,
 } from "lucide-react";
 import { toast } from "sonner";
 import { getInitials } from "@/lib/utils";
@@ -198,18 +200,18 @@ export default function PerfilPage() {
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Coluna da esquerda - Foto */}
-        <Card>
-          <CardHeader>
+        <Card className="border-primary/10">
+          <CardHeader className="bg-primary/5 pb-4 rounded-t-lg">
             <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
+              <User className="h-5 w-5 text-primary" />
               Foto de Perfil
             </CardTitle>
             <CardDescription>Altere sua foto de perfil</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col items-center space-y-4">
-            <Avatar className="h-32 w-32">
+          <CardContent className="flex flex-col items-center space-y-4 pt-6">
+            <Avatar className="h-32 w-32 border-4 border-primary/10 shadow-lg">
               <AvatarImage src={photoPreview || undefined} alt={session.user.name || ""} />
-              <AvatarFallback className="text-2xl">{getInitials(session.user.name)}</AvatarFallback>
+              <AvatarFallback className="text-2xl bg-primary/5">{getInitials(session.user.name)}</AvatarFallback>
             </Avatar>
             
             <div className="flex flex-col w-full max-w-xs">
@@ -243,19 +245,31 @@ export default function PerfilPage() {
         </Card>
         
         {/* Coluna central - Tabs para Dados e Senha */}
-        <Card className="md:col-span-2">
-          <CardHeader>
+        <Card className="md:col-span-2 border-primary/10">
+          <CardHeader className="bg-primary/5 pb-4 rounded-t-lg">
             <CardTitle>Dados pessoais</CardTitle>
             <CardDescription>Altere seus dados ou senha de acesso</CardDescription>
           </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="dados">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="dados">Dados</TabsTrigger>
-                <TabsTrigger value="senha">Senha</TabsTrigger>
+          <CardContent className="pt-6">
+            <Tabs defaultValue="dados" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-6 p-1 bg-muted/80 rounded-lg">
+                <TabsTrigger 
+                  value="dados" 
+                  className="rounded-md data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:font-medium flex items-center justify-center py-2.5 gap-2"
+                >
+                  <UserCircle className="h-4 w-4" />
+                  Dados
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="senha" 
+                  className="rounded-md data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:font-medium flex items-center justify-center py-2.5 gap-2"
+                >
+                  <ShieldAlert className="h-4 w-4" />
+                  Senha
+                </TabsTrigger>
               </TabsList>
               
-              <TabsContent value="dados" className="space-y-4 pt-4">
+              <TabsContent value="dados" className="space-y-4 pt-2 data-[state=active]:animate-in data-[state=active]:fade-in-50">
                 <div className="space-y-2">
                   <Label htmlFor="nome">Nome</Label>
                   <Input
@@ -263,6 +277,7 @@ export default function PerfilPage() {
                     value={nome}
                     onChange={(e) => setNome(e.target.value)}
                     placeholder="Seu nome completo"
+                    className="border-primary/20 focus-visible:ring-primary/30"
                   />
                 </div>
                 
@@ -280,6 +295,7 @@ export default function PerfilPage() {
                 <Button 
                   onClick={handleSaveProfile} 
                   disabled={loading || nome === session.user.name}
+                  className="mt-2"
                 >
                   {loading ? (
                     <>
@@ -295,7 +311,7 @@ export default function PerfilPage() {
                 </Button>
               </TabsContent>
               
-              <TabsContent value="senha" className="space-y-4 pt-4">
+              <TabsContent value="senha" className="space-y-4 pt-2 data-[state=active]:animate-in data-[state=active]:fade-in-50">
                 <div className="space-y-2">
                   <Label htmlFor="senha-atual">Senha atual</Label>
                   <Input
@@ -304,6 +320,7 @@ export default function PerfilPage() {
                     value={senhaAtual}
                     onChange={(e) => setSenhaAtual(e.target.value)}
                     placeholder="Digite sua senha atual"
+                    className="border-primary/20 focus-visible:ring-primary/30"
                   />
                 </div>
                 
@@ -315,6 +332,7 @@ export default function PerfilPage() {
                     value={novaSenha}
                     onChange={(e) => setNovaSenha(e.target.value)}
                     placeholder="Digite sua nova senha"
+                    className="border-primary/20 focus-visible:ring-primary/30"
                   />
                 </div>
                 
@@ -326,12 +344,14 @@ export default function PerfilPage() {
                     value={confirmarSenha}
                     onChange={(e) => setConfirmarSenha(e.target.value)}
                     placeholder="Confirme sua nova senha"
+                    className="border-primary/20 focus-visible:ring-primary/30"
                   />
                 </div>
                 
                 <Button 
                   onClick={handleChangePassword} 
                   disabled={loading || !senhaAtual || !novaSenha || !confirmarSenha}
+                  className="mt-2"
                 >
                   {loading ? (
                     <>
@@ -351,11 +371,11 @@ export default function PerfilPage() {
         </Card>
         
         {/* Terceira coluna - Histórico de acessos (ocupa toda a largura em telas maiores) */}
-        <Card className="md:col-span-3">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card className="md:col-span-3 border-primary/10">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 bg-primary/5 rounded-t-lg">
             <div>
               <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5" />
+                <Clock className="h-5 w-5 text-primary" />
                 Histórico de acessos
               </CardTitle>
               <CardDescription>Seus últimos acessos ao sistema (horário em UTC)</CardDescription>
@@ -365,16 +385,17 @@ export default function PerfilPage() {
               size="icon" 
               onClick={buscarHistoricoAcessos}
               disabled={loadingHistorico}
+              className="h-9 w-9 border-primary/20 hover:bg-primary/5"
             >
               <RefreshCw className={`h-4 w-4 ${loadingHistorico ? 'animate-spin' : ''}`} />
               <span className="sr-only">Atualizar</span>
             </Button>
           </CardHeader>
-          <CardContent>
-            <div className="rounded-md border">
+          <CardContent className="pt-6">
+            <div className="rounded-md border border-primary/10 overflow-hidden">
               <table className="min-w-full divide-y divide-border">
                 <thead>
-                  <tr className="bg-muted/50">
+                  <tr className="bg-primary/5">
                     <th className="px-4 py-3 text-left text-sm font-medium">Data/Hora</th>
                     <th className="px-4 py-3 text-left text-sm font-medium">Local</th>
                     <th className="px-4 py-3 text-left text-sm font-medium">Endereço IP</th>
@@ -385,7 +406,7 @@ export default function PerfilPage() {
                   {loadingHistorico ? (
                     <tr>
                       <td colSpan={4} className="px-4 py-6 text-center">
-                        <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+                        <Loader2 className="h-5 w-5 animate-spin mx-auto text-primary/70" />
                         <span className="text-sm text-muted-foreground mt-2 block">
                           Carregando histórico...
                         </span>
