@@ -1,22 +1,30 @@
+"use client";
+
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { Header } from "@/components/header";
+import { Sidebar } from "@/components/sidebar";
 
-export default async function AuthLayout({
-  children,
-}: {
+interface AuthLayoutProps {
   children: React.ReactNode;
-}) {
+}
+
+export default async function AuthLayout({ children }: AuthLayoutProps) {
   const session = await auth();
 
-  if (!session) {
+  if (!session?.user) {
     redirect("/login");
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <Header />
-      <main className="flex-1">{children}</main>
+    <div className="flex h-screen">
+      <Sidebar />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Header />
+        <main className="flex-1 overflow-y-auto p-4">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

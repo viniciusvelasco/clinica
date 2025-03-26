@@ -78,7 +78,7 @@ export function Header() {
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="ghost" size="icon" className="h-11 w-11 hover:bg-muted">
-                <HelpCircle className="h-9 w-9 text-muted-foreground transition-colors hover:text-primary" />
+                <HelpCircle className="h-8 w-8 text-muted-foreground transition-colors hover:text-primary" />
               </Button>
             </PopoverTrigger>
             <PopoverContent align="end" className="w-72">
