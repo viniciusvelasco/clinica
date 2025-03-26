@@ -5,6 +5,7 @@ import { Roboto } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from '@/contexts/language-context';
 import { SessionProvider } from "next-auth/react";
+import { Toaster } from "@/components/ui/sonner";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -14,8 +15,8 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: "Clínica",
-  description: "Sistema de gerenciamento de clínica",
+  title: "Sistema de Gestão Clínica",
+  description: "Sistema para gerenciamento de clínicas médicas",
 };
 
 export const viewport: Viewport = {
@@ -43,6 +44,7 @@ export default function RootLayout({
             </ThemeProvider>
           </LanguageProvider>
         </SessionProvider>
+        <Toaster />
       </body>
     </html>
   );
