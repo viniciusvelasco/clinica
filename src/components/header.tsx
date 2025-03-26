@@ -78,7 +78,7 @@ export function Header() {
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="ghost" size="icon" className="h-11 w-11 hover:bg-muted">
-                <HelpCircle className="h-7 w-7 text-muted-foreground transition-colors hover:text-primary" />
+                <HelpCircle className="h-9 w-9 text-muted-foreground transition-colors hover:text-primary" />
               </Button>
             </PopoverTrigger>
             <PopoverContent align="end" className="w-72">
@@ -103,7 +103,7 @@ export function Header() {
           <Popover open={showNotifications} onOpenChange={setShowNotifications}>
             <PopoverTrigger asChild>
               <Button variant="ghost" size="icon" className="relative h-11 w-11 hover:bg-muted">
-                <Bell className="h-7 w-7 text-muted-foreground transition-colors hover:text-primary" />
+                <Bell className="h-9 w-9 text-muted-foreground transition-colors hover:text-primary" />
                 <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
                   3
                 </span>

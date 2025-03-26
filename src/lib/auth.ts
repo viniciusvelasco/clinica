@@ -32,7 +32,7 @@ export const authConfig = {
         const user = await db.user.findUnique({
           where: { email }
         });
-
+        console.log(user);
         if (!user || !user.password) return null;
 
         const isPasswordValid = await compare(password, user.password);
