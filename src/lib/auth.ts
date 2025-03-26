@@ -40,6 +40,14 @@ export const authConfig = {
 
         if (!isPasswordValid) return null;
 
+        // Registrar histórico de login
+        await db.historicoLogin.create({
+          data: {
+            userId: user.id,
+            timestamp: new Date(),
+          },
+        });
+
         return {
           id: user.id,
           email: user.email || "",

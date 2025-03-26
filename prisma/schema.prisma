@@ -53,6 +53,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   historicoAcessos HistoricoAcesso[]
+  historico     HistoricoLogin[]
 }
 
 model VerificationToken {
@@ -75,4 +76,13 @@ model HistoricoAcesso {
 
   @@index([userId])
   @@map("historico_acessos")
+}
+
+model HistoricoLogin {
+  id        String   @id @default(cuid())
+  userId    String
+  timestamp DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("historico_login")
 }

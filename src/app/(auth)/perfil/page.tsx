@@ -201,7 +201,7 @@ export default function PerfilPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Coluna da esquerda - Foto */}
         <Card className="border-primary/10">
-          <CardHeader className="bg-primary/10 p-4 rounded-t-lg">
+          <CardHeader className="bg-primary/10 px-4 py-3 rounded-t-lg">
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5 text-primary" />
               Foto de Perfil
@@ -246,7 +246,7 @@ export default function PerfilPage() {
         
         {/* Coluna central - Tabs para Dados e Senha */}
         <Card className="md:col-span-2 border-primary/10">
-          <CardHeader className="bg-primary/10 p-4 rounded-t-lg">
+          <CardHeader className="bg-primary/10 px-4 py-3 rounded-t-lg">
             <CardTitle>Dados pessoais</CardTitle>
             <CardDescription>Altere seus dados ou senha de acesso</CardDescription>
           </CardHeader>
@@ -372,7 +372,7 @@ export default function PerfilPage() {
         
         {/* Terceira coluna - Histórico de acessos (ocupa toda a largura em telas maiores) */}
         <Card className="md:col-span-3 border-primary/10">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 bg-primary/10 p-4 rounded-t-lg">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 bg-primary/10 px-4 py-3 rounded-t-lg">
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Clock className="h-5 w-5 text-primary" />
