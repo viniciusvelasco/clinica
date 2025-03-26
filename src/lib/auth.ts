@@ -40,6 +40,35 @@ export const authConfig = {
 
         if (!isPasswordValid) return null;
 
+        // Registrar histórico de acesso
+        try {
+          // Extrair informações do navegador e IP de forma segura
+          let ip = "Desconhecido";
+          let browser = "Desconhecido";
+          
+          if (req?.headers && typeof req.headers.get === 'function') {
+            browser = req.headers.get("user-agent") || "Desconhecido";
+            const forwarded = req.headers.get("x-forwarded-for") || "";
+            const realIp = req.headers.get("x-real-ip") || "";
+            
+            ip = forwarded ? forwarded.split(",")[0].trim() : 
+                 realIp ? realIp : "Desconhecido";
+          }
+          
+          await db.historicoAcesso.create({
+            data: {
+              userId: user.id,
+              dataHora: new Date(),
+              ip,
+              browser,
+              local: "Brasil"
+            }
+          });
+          console.log("Histórico de acesso registrado com sucesso");
+        } catch (error) {
+          console.error("Erro ao registrar histórico de acesso:", error);
+        }
+
         return {
           id: user.id,
           email: user.email || "",
@@ -88,27 +117,6 @@ export const signIn = async (credentials: { email: string; password: string }, r
       ...credentials,
       redirect: false,
     });
-
-    if (result?.ok && !result?.error) {
-      const session = await auth();
-      
-      if (session?.user?.id) {
-        try {
-          // Registrar histórico de acesso
-          await db.historicoAcesso.create({
-            data: {
-              userId: session.user.id,
-              dataHora: new Date(),
-              ip: req?.headers?.get('x-forwarded-for') || 'Desconhecido',
-              browser: req?.headers?.get('user-agent') || 'Desconhecido',
-              local: 'Brasil'
-            }
-          });
-        } catch (error) {
-          console.error('Erro ao registrar acesso:', error);
-        }
-      }
-    }
 
     return result;
   } catch (error) {
