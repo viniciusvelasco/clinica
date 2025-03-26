@@ -55,18 +55,26 @@ export const authConfig = {
                  realIp ? realIp : "Desconhecido";
           }
           
-          await db.historicoAcesso.create({
-            data: {
-              userId: user.id,
-              dataHora: new Date(),
-              ip,
-              browser,
-              local: "Brasil"
+          // Registrar histórico de forma assíncrona sem bloquear o login
+          Promise.resolve().then(async () => {
+            try {
+              await db.historicoAcesso.create({
+                data: {
+                  userId: user.id,
+                  dataHora: new Date(),
+                  ip,
+                  browser,
+                  local: "Brasil"
+                }
+              });
+              console.log("Histórico de acesso registrado com sucesso");
+            } catch (registroError) {
+              console.error("Erro ao registrar histórico de acesso:", registroError);
             }
           });
-          console.log("Histórico de acesso registrado com sucesso");
         } catch (error) {
-          console.error("Erro ao registrar histórico de acesso:", error);
+          // Apenas log do erro, não interrompe o login
+          console.error("Erro ao processar dados para histórico:", error);
         }
 
         return {
