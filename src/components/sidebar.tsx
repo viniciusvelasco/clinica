@@ -10,10 +10,11 @@ import {
   Users,
   UserCog,
   Settings,
-  ChevronRight,
   Menu,
   Building2,
-  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  PanelLeft,
 } from "lucide-react";
 import {
   Sheet,
@@ -59,6 +60,23 @@ export function Sidebar({ className }: SidebarProps) {
     return () => window.removeEventListener("resize", checkIsMobile);
   }, []);
 
+  // Função para obter todos os itens (incluindo subitens)
+  const getAllItems = () => {
+    let allItems: MenuItem[] = [];
+    
+    menuItems.forEach(item => {
+      if (item.items) {
+        // Adiciona os subitens diretamente à lista
+        allItems = [...allItems, ...item.items];
+      } else {
+        // Adiciona o item normal
+        allItems.push(item);
+      }
+    });
+    
+    return allItems;
+  };
+
   const menuItems: MenuItem[] = [
     {
       label: "Dashboard",
@@ -76,17 +94,17 @@ export function Sidebar({ className }: SidebarProps) {
       items: [
         {
           label: "Clínica",
-          icon: <Building2 className="h-4 w-4" />,
+          icon: <Building2 className="h-5 w-5" />,
           href: "/cadastros/clinica",
         },
         {
           label: "Médico",
-          icon: <UserCog className="h-4 w-4" />,
+          icon: <UserCog className="h-5 w-5" />,
           href: "/cadastros/medico",
         },
         {
           label: "Paciente",
-          icon: <Users className="h-4 w-4" />,
+          icon: <Users className="h-5 w-5" />,
           href: "/cadastros/paciente",
         },
       ],
@@ -97,7 +115,7 @@ export function Sidebar({ className }: SidebarProps) {
       items: [
         {
           label: "Clínica",
-          icon: <Building2 className="h-4 w-4" />,
+          icon: <Building2 className="h-5 w-5" />,
           href: "/parametros/clinica",
         },
       ],
@@ -113,111 +131,114 @@ export function Sidebar({ className }: SidebarProps) {
   };
 
   const SidebarContent = () => (
-    <div className={cn("flex h-full flex-col gap-4", className)}>
-      <div className="flex h-14 items-center px-3 justify-between">
+    <div className={cn("flex h-full flex-col", className)}>
+      <div className="flex justify-between items-center py-2 px-4 border-b">
+        {!isCollapsed && <span className="font-medium text-sm">Menu</span>}
         <Button
           variant="ghost"
           size="icon"
-          className="h-9 w-9 ml-auto"
+          className="h-8 w-8 rounded-full bg-muted/50 hover:bg-muted"
           onClick={() => setIsCollapsed(!isCollapsed)}
         >
-          <ChevronRight
-            className={cn(
-              "h-5 w-5 transition-transform",
-              isCollapsed ? "rotate-180" : ""
-            )}
-          />
+          {isCollapsed ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-4 w-4" />
+          )}
         </Button>
       </div>
 
-      <nav className="flex-1 space-y-1 px-3">
-        {menuItems.map((item, index) => {
-          if (item.items) {
-            const isOpen = openGroups.includes(item.label);
-            return (
-              <div key={item.label} className="space-y-1">
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    "w-full justify-start gap-3 hover:bg-muted/50",
-                    isCollapsed ? "px-3" : "px-4"
-                  )}
-                  onClick={() => !isCollapsed && toggleGroup(item.label)}
-                >
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="flex items-center gap-3">
-                          {item.icon}
-                          {!isCollapsed && (
-                            <>
-                              <span>{item.label}</span>
-                              <ChevronDown
-                                className={cn(
-                                  "ml-auto h-4 w-4 transition-transform",
-                                  isOpen ? "rotate-180" : ""
-                                )}
-                              />
-                            </>
-                          )}
-                        </div>
-                      </TooltipTrigger>
-                      {isCollapsed && (
-                        <TooltipContent side="right">
-                          {item.label}
-                        </TooltipContent>
-                      )}
-                    </Tooltip>
-                  </TooltipProvider>
-                </Button>
-                {!isCollapsed && isOpen && (
-                  <div className="space-y-1 pl-6">
-                    {item.items.map((subItem) => (
-                      <Link
-                        key={subItem.href}
-                        href={subItem.href || "#"}
-                        className={cn(
-                          "group flex items-center gap-3 rounded-md px-4 py-2 text-sm font-medium hover:bg-muted/50",
-                          pathname === subItem.href
-                            ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                            : "text-muted-foreground hover:text-foreground"
-                        )}
-                      >
-                        {subItem.icon}
-                        <span>{subItem.label}</span>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          }
-
-          return (
-            <TooltipProvider key={item.label}>
+      <nav className="flex-1 p-2 space-y-1">
+        {isCollapsed ? (
+          // Modo colapsado: mostra todos os itens de menu (incluindo subitens de grupos)
+          getAllItems().map((item) => (
+            <TooltipProvider key={item.href}>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Link
                     href={item.href || "#"}
                     className={cn(
-                      "group flex items-center gap-3 rounded-md px-4 py-2 text-sm font-medium hover:bg-muted/50",
+                      "flex justify-center items-center h-10 w-10 rounded-full mx-auto my-2",
                       pathname === item.href
-                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                        : "text-muted-foreground hover:text-foreground",
-                      isCollapsed && "justify-center px-3"
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                     )}
                   >
                     {item.icon}
-                    {!isCollapsed && <span>{item.label}</span>}
                   </Link>
                 </TooltipTrigger>
-                {isCollapsed && (
-                  <TooltipContent side="right">{item.label}</TooltipContent>
-                )}
+                <TooltipContent side="right">
+                  {item.label}
+                </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-          );
-        })}
+          ))
+        ) : (
+          // Modo expandido: mostra grupos expansíveis
+          menuItems.map((item) => {
+            if (item.items) {
+              const isOpen = openGroups.includes(item.label);
+              return (
+                <div key={item.label} className="space-y-1">
+                  <Button
+                    variant="ghost"
+                    className={cn(
+                      "w-full justify-between items-center px-3 py-2 text-sm font-medium rounded-lg",
+                      isOpen ? "bg-muted" : "hover:bg-muted/50"
+                    )}
+                    onClick={() => toggleGroup(item.label)}
+                  >
+                    <div className="flex items-center gap-3">
+                      {item.icon}
+                      <span>{item.label}</span>
+                    </div>
+                    <ChevronRight 
+                      className={cn(
+                        "h-4 w-4 transition-transform",
+                        isOpen ? "rotate-90" : ""
+                      )}
+                    />
+                  </Button>
+                  {isOpen && (
+                    <div className="pl-4 space-y-1 mt-1">
+                      {item.items.map((subItem) => (
+                        <Link
+                          key={subItem.href}
+                          href={subItem.href || "#"}
+                          className={cn(
+                            "flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg",
+                            pathname === subItem.href
+                              ? "bg-primary/10 text-primary"
+                              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          )}
+                        >
+                          {subItem.icon}
+                          <span>{subItem.label}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href || "#"}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg",
+                  pathname === item.href
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                )}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </Link>
+            );
+          })
+        )}
       </nav>
     </div>
   );
@@ -244,8 +265,8 @@ export function Sidebar({ className }: SidebarProps) {
   return (
     <div
       className={cn(
-        "flex h-screen border-r bg-background transition-all duration-300",
-        isCollapsed ? "w-16" : "w-64"
+        "border-r bg-background transition-all duration-300",
+        isCollapsed ? "w-16" : "w-60"
       )}
     >
       <SidebarContent />

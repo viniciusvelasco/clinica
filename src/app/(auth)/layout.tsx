@@ -1,19 +1,7 @@
-"use client";
-
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { handleSignOut } from "@/lib/actions";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -27,10 +15,10 @@ export default async function AuthLayout({ children }: AuthLayoutProps) {
   }
 
   return (
-    <div className="flex h-screen">
-      <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Header />
+    <div className="flex flex-col h-screen">
+      <Header />
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar />
         <main className="flex-1 overflow-y-auto p-4">
           {children}
         </main>
@@ -38,6 +26,17 @@ export default async function AuthLayout({ children }: AuthLayoutProps) {
     </div>
   );
 }
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { signOut } from "@/lib/auth";
 
 interface UserNavProps {
   user: {
@@ -68,8 +67,14 @@ function UserNav({ user }: UserNavProps) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <form action={handleSignOut} className="w-full">
+        <DropdownMenuItem>
+          <form
+            action={async () => {
+              "use server";
+              await signOut({ redirectTo: "/login" });
+            }}
+            className="w-full"
+          >
             <button type="submit" className="w-full text-left">
               Sair
             </button>
