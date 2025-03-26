@@ -14,7 +14,6 @@ import {
   Building2,
   ChevronLeft,
   ChevronRight,
-  PanelLeft,
 } from "lucide-react";
 import {
   Sheet,
@@ -131,24 +130,8 @@ export function Sidebar({ className }: SidebarProps) {
   };
 
   const SidebarContent = () => (
-    <div className={cn("flex h-full flex-col", className)}>
-      <div className="flex justify-between items-center py-2 px-4 border-b">
-        {!isCollapsed && <span className="font-medium text-sm">Menu</span>}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 rounded-full bg-muted/50 hover:bg-muted"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-        >
-          {isCollapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <ChevronLeft className="h-4 w-4" />
-          )}
-        </Button>
-      </div>
-
-      <nav className="flex-1 p-2 space-y-1">
+    <div className={cn("flex h-full flex-col relative", className)}>
+      <nav className="flex-1 pt-4 px-3 space-y-2">
         {isCollapsed ? (
           // Modo colapsado: mostra todos os itens de menu (incluindo subitens de grupos)
           getAllItems().map((item) => (
@@ -240,6 +223,25 @@ export function Sidebar({ className }: SidebarProps) {
           })
         )}
       </nav>
+      
+      {/* Botão de Collapse posicionado no canto inferior */}
+      <div className="absolute bottom-4 right-0">
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn(
+            "h-8 w-5 rounded-l-md flex items-center justify-center transition-all",
+            isCollapsed ? "bg-muted/80" : "bg-muted/50 hover:bg-muted/80"
+          )}
+          onClick={() => setIsCollapsed(!isCollapsed)}
+        >
+          {isCollapsed ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-4 w-4" />
+          )}
+        </Button>
+      </div>
     </div>
   );
 
