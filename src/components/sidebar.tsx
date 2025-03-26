@@ -44,6 +44,7 @@ export function Sidebar({ className }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [openGroups, setOpenGroups] = useState<string[]>([]);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Detectar se é mobile
   useEffect(() => {
@@ -58,6 +59,16 @@ export function Sidebar({ className }: SidebarProps) {
     window.addEventListener("resize", checkIsMobile);
     return () => window.removeEventListener("resize", checkIsMobile);
   }, []);
+
+  // Função para colapsar com efeito
+  const toggleCollapse = () => {
+    setIsTransitioning(true);
+    setIsCollapsed(!isCollapsed);
+    // Reset transitioning state after animation completes
+    setTimeout(() => {
+      setIsTransitioning(false);
+    }, 300);
+  };
 
   // Função para obter todos os itens (incluindo subitens)
   const getAllItems = () => {
@@ -131,7 +142,28 @@ export function Sidebar({ className }: SidebarProps) {
 
   const SidebarContent = () => (
     <div className={cn("flex h-full flex-col relative", className)}>
-      <nav className="flex-1 pt-4 px-3 space-y-2">
+      <div className="pt-3 px-3 flex items-center">
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn(
+            "h-8 w-8 rounded-full bg-muted/50 hover:bg-muted transition-colors",
+            isTransitioning && "scale-90"
+          )}
+          onClick={toggleCollapse}
+        >
+          {isCollapsed ? (
+            <ChevronRight className="h-4 w-4 transition-transform" />
+          ) : (
+            <ChevronLeft className="h-4 w-4 transition-transform" />
+          )}
+        </Button>
+      </div>
+
+      <nav className={cn(
+        "flex-1 pt-4 px-3 space-y-2 transition-all duration-300",
+        isTransitioning && "opacity-50 scale-95"
+      )}>
         {isCollapsed ? (
           // Modo colapsado: mostra todos os itens de menu (incluindo subitens de grupos)
           getAllItems().map((item) => (
@@ -141,7 +173,7 @@ export function Sidebar({ className }: SidebarProps) {
                   <Link
                     href={item.href || "#"}
                     className={cn(
-                      "flex justify-center items-center h-10 w-10 rounded-full mx-auto my-2",
+                      "flex justify-center items-center h-10 w-10 rounded-full mx-auto my-2 transition-all duration-200 hover:scale-110",
                       pathname === item.href
                         ? "bg-primary text-primary-foreground"
                         : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
@@ -166,7 +198,7 @@ export function Sidebar({ className }: SidebarProps) {
                   <Button
                     variant="ghost"
                     className={cn(
-                      "w-full justify-between items-center px-3 py-2 text-sm font-medium rounded-lg",
+                      "w-full justify-between items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200",
                       isOpen ? "bg-muted" : "hover:bg-muted/50"
                     )}
                     onClick={() => toggleGroup(item.label)}
@@ -177,19 +209,19 @@ export function Sidebar({ className }: SidebarProps) {
                     </div>
                     <ChevronRight 
                       className={cn(
-                        "h-4 w-4 transition-transform",
+                        "h-4 w-4 transition-transform duration-200",
                         isOpen ? "rotate-90" : ""
                       )}
                     />
                   </Button>
                   {isOpen && (
-                    <div className="pl-4 space-y-1 mt-1">
+                    <div className="pl-4 space-y-1 mt-1 animate-slideDown">
                       {item.items.map((subItem) => (
                         <Link
                           key={subItem.href}
                           href={subItem.href || "#"}
                           className={cn(
-                            "flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg",
+                            "flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200",
                             pathname === subItem.href
                               ? "bg-primary/10 text-primary"
                               : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
@@ -210,10 +242,10 @@ export function Sidebar({ className }: SidebarProps) {
                 key={item.href}
                 href={item.href || "#"}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg",
+                  "flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200",
                   pathname === item.href
                     ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50 hover:translate-x-1"
                 )}
               >
                 {item.icon}
@@ -223,21 +255,6 @@ export function Sidebar({ className }: SidebarProps) {
           })
         )}
       </nav>
-      
-      {/* Botão de Collapse centralizado na borda lateral */}
-      <div className="absolute top-1/2 -translate-y-1/2 -right-3.5 z-10">
-        <Button
-          variant="outline"
-          size="icon"
-          className={cn(
-            "h-7 w-7 rounded-full border border-border bg-background shadow-md",
-            isCollapsed ? "rotate-180" : ""
-          )}
-          onClick={() => setIsCollapsed(!isCollapsed)}
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-      </div>
     </div>
   );
 
@@ -264,7 +281,8 @@ export function Sidebar({ className }: SidebarProps) {
     <div
       className={cn(
         "border-r bg-background transition-all duration-300",
-        isCollapsed ? "w-16" : "w-60"
+        isCollapsed ? "w-16" : "w-60",
+        isTransitioning && "blur-[0.5px]"
       )}
     >
       <SidebarContent />
