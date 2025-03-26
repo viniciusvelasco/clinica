@@ -55,10 +55,10 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
+      <div className="container flex h-16 items-center">
         {/* Logo e nome do sistema */}
-        <div className="flex items-center gap-2">
-          <Link href="/dashboard" className="flex items-center gap-2 transition-opacity hover:opacity-90">
+        <div className="flex items-center gap-3 px-4">
+          <Link href="/dashboard" className="flex items-center gap-3 transition-opacity hover:opacity-90">
             <Image
               src="/medical-logo.svg"
               alt="Logo"
@@ -66,19 +66,19 @@ export function Header() {
               height={32}
               className="h-8 w-8"
             />
-            <span className="hidden font-bold sm:inline-block">
+            <span className="hidden font-bold lg:inline-block text-lg">
               Sistema Clínico
             </span>
           </Link>
         </div>
 
         {/* Ações do usuário */}
-        <div className="flex items-center gap-4">
+        <div className="ml-auto flex items-center gap-3 px-4">
           {/* Botão de ajuda */}
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" className="hover:bg-muted">
-                <HelpCircle className="h-5 w-5 text-muted-foreground transition-colors hover:text-primary" />
+              <Button variant="ghost" size="icon" className="h-10 w-10 hover:bg-muted">
+                <HelpCircle className="h-6 w-6 text-muted-foreground transition-colors hover:text-primary" />
               </Button>
             </PopoverTrigger>
             <PopoverContent align="end" className="w-72">
@@ -102,9 +102,9 @@ export function Header() {
           {/* Notificações */}
           <Popover open={showNotifications} onOpenChange={setShowNotifications}>
             <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative hover:bg-muted">
-                <Bell className="h-5 w-5 text-muted-foreground transition-colors hover:text-primary" />
-                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
+              <Button variant="ghost" size="icon" className="relative h-10 w-10 hover:bg-muted">
+                <Bell className="h-6 w-6 text-muted-foreground transition-colors hover:text-primary" />
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
                   3
                 </span>
               </Button>
@@ -118,13 +118,17 @@ export function Header() {
                   </Button>
                 </div>
                 <Separator />
-                <div className="space-y-4">
+                <div className="space-y-1">
                   {notifications.map((notification) => (
-                    <div
+                    <button
                       key={notification.id}
-                      className="flex gap-4 rounded-lg p-2 hover:bg-muted"
+                      className="w-full rounded-lg p-3 text-left transition-colors hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                      onClick={() => {
+                        // Aqui você pode adicionar a ação ao clicar na notificação
+                        console.log('Notificação clicada:', notification.id);
+                      }}
                     >
-                      <div className="flex-1 space-y-1">
+                      <div className="flex flex-col gap-1">
                         <p className="text-sm font-medium leading-none">
                           {notification.title}
                         </p>
@@ -135,7 +139,7 @@ export function Header() {
                           {notification.time}
                         </p>
                       </div>
-                    </div>
+                    </button>
                   ))}
                 </div>
                 <Separator />
@@ -151,9 +155,9 @@ export function Header() {
             <PopoverTrigger asChild>
               <Button
                 variant="ghost"
-                className="relative h-8 w-8 rounded-full hover:bg-muted"
+                className="relative h-10 w-10 rounded-full hover:bg-muted"
               >
-                <Avatar className="h-8 w-8">
+                <Avatar className="h-9 w-9">
                   <AvatarImage
                     src={session?.user?.image || undefined}
                     alt={session?.user?.name || ""}
