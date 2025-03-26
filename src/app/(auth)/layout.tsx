@@ -4,6 +4,16 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { handleSignOut } from "@/lib/actions";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -28,17 +38,6 @@ export default async function AuthLayout({ children }: AuthLayoutProps) {
     </div>
   );
 }
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { signOut } from "@/lib/auth";
 
 interface UserNavProps {
   user: {
@@ -69,14 +68,8 @@ function UserNav({ user }: UserNavProps) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <form
-            action={async () => {
-              "use server";
-              await signOut({ redirectTo: "/login" });
-            }}
-            className="w-full"
-          >
+        <DropdownMenuItem asChild>
+          <form action={handleSignOut} className="w-full">
             <button type="submit" className="w-full text-left">
               Sair
             </button>
