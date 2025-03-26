@@ -5,7 +5,7 @@ export function Footer() {
   
   return (
     <footer className="w-full border-t py-3 px-4 bg-muted/30">
-      <div className="container flex items-center justify-between text-sm text-muted-foreground">
+      <div className="container w-full flex items-center justify-between text-sm text-muted-foreground">
         <div className="flex items-center gap-1">
           <span>© {currentYear} Sistema de Gestão Clínica</span>
         </div>

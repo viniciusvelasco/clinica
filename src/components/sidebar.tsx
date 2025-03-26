@@ -142,24 +142,6 @@ export function Sidebar({ className }: SidebarProps) {
 
   const SidebarContent = () => (
     <div className={cn("flex h-full flex-col relative", className)}>
-      <div className="pt-3 px-3 flex items-center">
-        <Button
-          variant="ghost"
-          size="icon"
-          className={cn(
-            "h-8 w-8 rounded-full bg-muted/50 hover:bg-muted transition-colors",
-            isTransitioning && "scale-90"
-          )}
-          onClick={toggleCollapse}
-        >
-          {isCollapsed ? (
-            <ChevronRight className="h-4 w-4 transition-transform" />
-          ) : (
-            <ChevronLeft className="h-4 w-4 transition-transform" />
-          )}
-        </Button>
-      </div>
-
       <nav className={cn(
         "flex-1 pt-4 px-3 space-y-2 transition-all duration-300",
         isTransitioning && "opacity-50 scale-95"
@@ -255,6 +237,22 @@ export function Sidebar({ className }: SidebarProps) {
           })
         )}
       </nav>
+      
+      {/* Botão de Collapse posicionado na lateral */}
+      <div className="absolute top-4 -right-3.5 z-10">
+        <Button
+          variant="outline"
+          size="icon"
+          className={cn(
+            "h-7 w-7 rounded-full border border-border bg-background shadow-md",
+            isCollapsed ? "rotate-180" : "",
+            isTransitioning && "scale-90"
+          )}
+          onClick={toggleCollapse}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+      </div>
     </div>
   );
 
