@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { Header } from "@/components/header";
 
 export default async function AuthLayout({
   children,
@@ -14,16 +15,7 @@ export default async function AuthLayout({
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur">
-        <div className="container flex h-16 items-center justify-between py-4">
-          <div>
-            <h1 className="text-xl font-bold">Clínica</h1>
-          </div>
-          <div>
-            <UserNav user={session.user} />
-          </div>
-        </div>
-      </header>
+      <Header />
       <main className="flex-1">{children}</main>
     </div>
   );
