@@ -29,59 +29,42 @@ import {
   RefreshCw,
   UserCircle,
   ShieldAlert,
+  History,
 } from "lucide-react";
 import { toast } from "sonner";
 import { getInitials } from "@/lib/utils";
 
 interface HistoricoAcesso {
   id: string;
-  dataHora: string;
+  userId: string;
+  dataHora: Date | string;
   ip: string;
   browser: string;
   local: string;
 }
 
-export default function PerfilPage() {
-  const { data: session, update } = useSession();
+interface PerfilClientProps {
+  user: {
+    id: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+  };
+  historico: HistoricoAcesso[];
+}
+
+// Componente client para a página de perfil
+export function PerfilClient({ user, historico }: PerfilClientProps) {
+  const { update } = useSession();
   
-  const [nome, setNome] = useState(session?.user?.name || "");
+  const [nome, setNome] = useState(user?.name || "");
   const [senhaAtual, setSenhaAtual] = useState("");
   const [novaSenha, setNovaSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingPhoto, setLoadingPhoto] = useState(false);
-  const [loadingHistorico, setLoadingHistorico] = useState(false);
   const [photo, setPhoto] = useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(session?.user?.image || null);
-  const [historicoAcessos, setHistoricoAcessos] = useState<HistoricoAcesso[]>([]);
-
-  // Buscar histórico de acessos
-  const buscarHistoricoAcessos = async () => {
-    if (!session?.user?.id) return;
-    
-    setLoadingHistorico(true);
-    
-    try {
-      const response = await fetch(`/api/auth/acesso?userId=${session.user.id}`);
-      const data = await response.json();
-      
-      if (data.historico) {
-        setHistoricoAcessos(data.historico);
-      }
-    } catch (error) {
-      console.error("Erro ao buscar histórico de acesso:", error);
-      toast.error("Não foi possível carregar o histórico de acessos");
-    } finally {
-      setLoadingHistorico(false);
-    }
-  };
-
-  // Carregar histórico quando a página for montada
-  useEffect(() => {
-    if (session?.user?.id) {
-      buscarHistoricoAcessos();
-    }
-  }, [session?.user?.id]);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(user?.image || null);
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -179,21 +162,6 @@ export default function PerfilPage() {
     }
   };
 
-  const formatarData = (dataString: string) => {
-    const data = new Date(dataString);
-    return new Intl.DateTimeFormat('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(data);
-  };
-
-  if (!session?.user) {
-    return <div>Carregando...</div>;
-  }
-
   return (
     <div className="container mx-auto">
       <h1 className="text-2xl font-bold mb-6">Meu Perfil</h1>
@@ -210,8 +178,8 @@ export default function PerfilPage() {
           </CardHeader>
           <CardContent className="flex flex-col items-center space-y-4">
             <Avatar className="h-32 w-32 border-4 border-primary/10 shadow-lg">
-              <AvatarImage src={photoPreview || undefined} alt={session.user.name || ""} />
-              <AvatarFallback className="text-2xl bg-primary/5">{getInitials(session.user.name)}</AvatarFallback>
+              <AvatarImage src={photoPreview || undefined} alt={user.name || ""} />
+              <AvatarFallback className="text-2xl bg-primary/5">{getInitials(user.name)}</AvatarFallback>
             </Avatar>
             
             <div className="flex flex-col w-full max-w-xs">
@@ -269,102 +237,89 @@ export default function PerfilPage() {
                 </TabsTrigger>
               </TabsList>
               
-              <TabsContent value="dados" className="space-y-4 pt-2 data-[state=active]:animate-in data-[state=active]:fade-in-50">
-                <div className="space-y-2">
-                  <Label htmlFor="nome">Nome</Label>
-                  <Input
-                    id="nome"
-                    value={nome}
-                    onChange={(e) => setNome(e.target.value)}
-                    placeholder="Seu nome completo"
-                    className="border-primary/20 focus-visible:ring-primary/30"
-                  />
+              <TabsContent value="dados" className="space-y-4">
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="name">Nome</Label>
+                    <Input
+                      id="name"
+                      value={nome}
+                      onChange={(e) => setNome(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      value={user.email || ""}
+                      disabled
+                    />
+                  </div>
+                  <Button 
+                    onClick={handleSaveProfile}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <span>Salvando...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Save className="mr-2 h-4 w-4" />
+                        <span>Salvar Alterações</span>
+                      </>
+                    )}
+                  </Button>
                 </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="email">E-mail</Label>
-                  <Input
-                    id="email"
-                    value={session.user.email || ""}
-                    disabled
-                    className="bg-muted"
-                  />
-                  <p className="text-xs text-muted-foreground">O e-mail não pode ser alterado.</p>
-                </div>
-                
-                <Button 
-                  onClick={handleSaveProfile} 
-                  disabled={loading || nome === session.user.name}
-                  className="mt-2"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      <span>Salvando...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Save className="mr-2 h-4 w-4" />
-                      <span>Salvar alterações</span>
-                    </>
-                  )}
-                </Button>
               </TabsContent>
               
-              <TabsContent value="senha" className="space-y-4 pt-2 data-[state=active]:animate-in data-[state=active]:fade-in-50">
-                <div className="space-y-2">
-                  <Label htmlFor="senha-atual">Senha atual</Label>
-                  <Input
-                    id="senha-atual"
-                    type="password"
-                    value={senhaAtual}
-                    onChange={(e) => setSenhaAtual(e.target.value)}
-                    placeholder="Digite sua senha atual"
-                    className="border-primary/20 focus-visible:ring-primary/30"
-                  />
+              <TabsContent value="senha" className="space-y-4">
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="current-password">Senha Atual</Label>
+                    <Input
+                      id="current-password"
+                      type="password"
+                      value={senhaAtual}
+                      onChange={(e) => setSenhaAtual(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="new-password">Nova Senha</Label>
+                    <Input
+                      id="new-password"
+                      type="password"
+                      value={novaSenha}
+                      onChange={(e) => setNovaSenha(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="confirm-password">Confirmar Senha</Label>
+                    <Input
+                      id="confirm-password"
+                      type="password"
+                      value={confirmarSenha}
+                      onChange={(e) => setConfirmarSenha(e.target.value)}
+                    />
+                  </div>
+                  <Button 
+                    onClick={handleChangePassword}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <span>Alterando...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Key className="mr-2 h-4 w-4" />
+                        <span>Alterar Senha</span>
+                      </>
+                    )}
+                  </Button>
                 </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="nova-senha">Nova senha</Label>
-                  <Input
-                    id="nova-senha"
-                    type="password"
-                    value={novaSenha}
-                    onChange={(e) => setNovaSenha(e.target.value)}
-                    placeholder="Digite sua nova senha"
-                    className="border-primary/20 focus-visible:ring-primary/30"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="confirmar-senha">Confirmar nova senha</Label>
-                  <Input
-                    id="confirmar-senha"
-                    type="password"
-                    value={confirmarSenha}
-                    onChange={(e) => setConfirmarSenha(e.target.value)}
-                    placeholder="Confirme sua nova senha"
-                    className="border-primary/20 focus-visible:ring-primary/30"
-                  />
-                </div>
-                
-                <Button 
-                  onClick={handleChangePassword} 
-                  disabled={loading || !senhaAtual || !novaSenha || !confirmarSenha}
-                  className="mt-2"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      <span>Alterando...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Key className="mr-2 h-4 w-4" />
-                      <span>Alterar senha</span>
-                    </>
-                  )}
-                </Button>
               </TabsContent>
             </Tabs>
           </CardContent>
@@ -375,56 +330,44 @@ export default function PerfilPage() {
           <CardHeader className="flex flex-row items-center justify-between space-y-0 bg-primary/10 px-4 py-3 rounded-t-lg">
             <div>
               <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-primary" />
-                Histórico de acessos
+                <History className="h-5 w-5 text-primary" />
+                Histórico de Acessos
               </CardTitle>
-              <CardDescription>Seus últimos acessos ao sistema (horário em UTC)</CardDescription>
+              <CardDescription>Seus últimos acessos ao sistema</CardDescription>
             </div>
-            <Button 
-              variant="outline" 
-              size="icon" 
-              onClick={buscarHistoricoAcessos}
-              disabled={loadingHistorico}
-              className="h-9 w-9 border-primary/20 hover:bg-primary/5"
-            >
-              <RefreshCw className={`h-4 w-4 ${loadingHistorico ? 'animate-spin' : ''}`} />
-              <span className="sr-only">Atualizar</span>
+            <Button variant="outline" size="icon" disabled>
+              <RefreshCw className="h-4 w-4" />
             </Button>
           </CardHeader>
           <CardContent>
             <div className="rounded-md border border-primary/10 overflow-hidden">
               <table className="min-w-full divide-y divide-border">
-                <thead>
-                  <tr className="bg-primary/5">
-                    <th className="px-4 py-3 text-left text-sm font-medium">Data/Hora</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium">Local</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium">Endereço IP</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium">Navegador</th>
+                <thead className="bg-muted/50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground tracking-wider">Data/Hora</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground tracking-wider">IP</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground tracking-wider">Navegador</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground tracking-wider">Local</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border">
-                  {loadingHistorico ? (
-                    <tr>
-                      <td colSpan={4} className="px-4 py-6 text-center">
-                        <Loader2 className="h-5 w-5 animate-spin mx-auto text-primary/70" />
-                        <span className="text-sm text-muted-foreground mt-2 block">
-                          Carregando histórico...
-                        </span>
-                      </td>
-                    </tr>
-                  ) : historicoAcessos.length > 0 ? (
-                    historicoAcessos.map((acesso) => (
-                      <tr key={acesso.id} className="hover:bg-muted/50">
-                        <td className="px-4 py-3 text-sm">{formatarData(acesso.dataHora)}</td>
-                        <td className="px-4 py-3 text-sm">{acesso.local}</td>
-                        <td className="px-4 py-3 text-sm">{acesso.ip}</td>
-                        <td className="px-4 py-3 text-sm">{acesso.browser}</td>
+                <tbody className="bg-card divide-y divide-border">
+                  {historico && historico.length > 0 ? (
+                    historico.map((acesso) => (
+                      <tr key={acesso.id}>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm">
+                          {new Date(acesso.dataHora).toLocaleString('pt-BR')}
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm">{acesso.ip}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm truncate max-w-[200px]">
+                          {acesso.browser}
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm">{acesso.local}</td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={4} className="px-4 py-6 text-center text-muted-foreground">
-                        Nenhum registro de acesso encontrado.
+                      <td colSpan={4} className="px-4 py-3 text-center text-sm text-muted-foreground">
+                        Nenhum acesso registrado
                       </td>
                     </tr>
                   )}
@@ -435,5 +378,28 @@ export default function PerfilPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+// Arquivo page.tsx (Server Component)
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { buscarHistoricoAcesso } from "@/actions/historico";
+
+export default async function PerfilPage() {
+  const session = await auth();
+  
+  if (!session?.user) {
+    redirect("/login");
+  }
+  
+  // Buscar histórico de acessos usando Server Action
+  const { historico } = await buscarHistoricoAcesso();
+  
+  return (
+    <PerfilClient 
+      user={session.user} 
+      historico={historico || []} 
+    />
   );
 } 
