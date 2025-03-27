@@ -381,11 +381,11 @@ export function PerfilClient({ user, historico }: PerfilClientProps) {
   );
 }
 
-// Arquivo page.tsx (Server Component)
+// Server Component - página de perfil
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { PerfilClient } from "./client";
 import { db } from "@/lib/db";
+import { PerfilForm } from "@/components/perfil/perfil-form";
 
 export default async function PerfilPage() {
   const session = await auth();
@@ -406,20 +406,10 @@ export default async function PerfilPage() {
       take: 10, // Limitar aos 10 acessos mais recentes
     });
     
-    return (
-      <PerfilClient 
-        user={session.user} 
-        historico={historico} 
-      />
-    );
+    return <PerfilForm user={session.user} historico={historico} />;
   } catch (error) {
     console.error("Erro ao buscar histórico:", error);
     
-    return (
-      <PerfilClient 
-        user={session.user} 
-        historico={[]} 
-      />
-    );
+    return <PerfilForm user={session.user} historico={[]} />;
   }
 } 

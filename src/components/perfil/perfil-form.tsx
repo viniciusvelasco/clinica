@@ -42,7 +42,7 @@ interface HistoricoAcesso {
   local: string;
 }
 
-interface PerfilClientProps {
+interface PerfilFormProps {
   user: {
     id: string;
     name?: string | null;
@@ -52,8 +52,7 @@ interface PerfilClientProps {
   historico: HistoricoAcesso[];
 }
 
-// Componente client para a página de perfil
-export function PerfilClient({ user, historico }: PerfilClientProps) {
+export function PerfilForm({ user, historico }: PerfilFormProps) {
   const { update } = useSession();
   
   const [nome, setNome] = useState(user?.name || "");
