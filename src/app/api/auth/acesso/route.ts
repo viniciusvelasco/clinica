@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getClientInfo } from "@/lib/utils";
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
 
 // Armazenamento temporário para histórico de acesso (em produção usaríamos o banco de dados)
 let historicoAcessoTemporario: any[] = [
@@ -65,27 +67,46 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET(req: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const userId = req.nextUrl.searchParams.get("userId");
+    // Verificar se o usuário está autenticado
+    const session = await auth();
     
-    if (!userId) {
+    if (!session?.user) {
       return NextResponse.json(
-        { error: "ID do usuário não fornecido" },
-        { status: 400 }
+        { error: "Não autorizado" },
+        { status: 401 }
       );
     }
-
-    // Filtrar e retornar os registros do usuário
-    const historico = historicoAcessoTemporario
-      .filter(acesso => acesso.userId === userId)
-      .slice(0, 10); // Limitar a 10 últimos acessos
-
+    
+    // Obter o userId da query string
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get("userId");
+    
+    // Verificar se o ID de usuário é válido
+    if (!userId || userId !== session.user.id) {
+      return NextResponse.json(
+        { error: "Acesso não autorizado" },
+        { status: 403 }
+      );
+    }
+    
+    // Buscar histórico de acessos do usuário
+    const historico = await db.historicoAcesso.findMany({
+      where: {
+        userId: session.user.id,
+      },
+      orderBy: {
+        dataHora: "desc",
+      },
+      take: 10, // Limitar aos 10 acessos mais recentes
+    });
+    
     return NextResponse.json({ historico });
   } catch (error) {
-    console.error("Erro ao buscar histórico de acesso:", error);
+    console.error("Erro ao buscar histórico de acessos:", error);
     return NextResponse.json(
-      { error: "Erro ao buscar histórico de acesso" },
+      { error: "Erro ao processar a solicitação" },
       { status: 500 }
     );
   }
