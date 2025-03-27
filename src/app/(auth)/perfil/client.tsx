@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,6 @@ import {
 import {
   User,
   Key,
-  Clock,
   Upload,
   Save,
   Loader2,
@@ -379,47 +378,4 @@ export function PerfilClient({ user, historico }: PerfilClientProps) {
       </div>
     </div>
   );
-}
-
-// Arquivo page.tsx (Server Component)
-import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
-import { PerfilClient } from "./client";
-import { db } from "@/lib/db";
-
-export default async function PerfilPage() {
-  const session = await auth();
-  
-  if (!session?.user) {
-    redirect("/login");
-  }
-  
-  // Carregar histórico de acesso no servidor diretamente do DB
-  try {
-    const historico = await db.historicoAcesso.findMany({
-      where: {
-        userId: session.user.id,
-      },
-      orderBy: {
-        dataHora: "desc",
-      },
-      take: 10, // Limitar aos 10 acessos mais recentes
-    });
-    
-    return (
-      <PerfilClient 
-        user={session.user} 
-        historico={historico} 
-      />
-    );
-  } catch (error) {
-    console.error("Erro ao buscar histórico:", error);
-    
-    return (
-      <PerfilClient 
-        user={session.user} 
-        historico={[]} 
-      />
-    );
-  }
 } 
