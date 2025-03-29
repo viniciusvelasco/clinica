@@ -77,6 +77,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
   
   // Efeito para sincronizar estado com propriedades
   useEffect(() => {
+    // Log inicial de debug
     console.log("Valores MFA recebidos:", { 
       mfaEnabled: user.mfaEnabled, 
       mfaSecret: user.mfaSecret,
@@ -96,11 +97,16 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
     setMfaEnabled(hasMfaEnabled || hasMfaInLanguage || false);
     setMfaSecret(user.mfaSecret || extractedSecret || null);
     
+    // Se temos um idioma válido que não seja um segredo MFA, atualizamos o contexto de linguagem
+    if (user.language && !hasMfaInLanguage) {
+      setLanguage(user.language as any);
+    }
+    
     console.log("Estado MFA definido:", {
       mfaEnabled: hasMfaEnabled || hasMfaInLanguage,
       mfaSecret: user.mfaSecret || extractedSecret || null
     });
-  }, [user.mfaEnabled, user.mfaSecret, user.language]);
+  }, [user.mfaEnabled, user.mfaSecret, user.language, setLanguage]);
   
   // Evitar erro de hidratação
   useEffect(() => {

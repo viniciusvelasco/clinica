@@ -29,8 +29,10 @@ export default async function ConfiguracoesPage() {
   // Fornecer informações do MFA
   const userWithMFA = {
     ...user,
-    mfaEnabled: false,  // Valor padrão, será sobrescrito no cliente
-    mfaSecret: null,
+    // Verificar se o MFA está ativado verificando o prefixo "mfa:" no campo language
+    mfaEnabled: user.language?.startsWith('mfa:') || false,
+    // Extrair o segredo MFA do campo language se existir
+    mfaSecret: user.language?.startsWith('mfa:') ? user.language.substring(4) : null,
     language: user.language || 'pt-BR'  // Garantir que o language sempre esteja presente
   };
   
