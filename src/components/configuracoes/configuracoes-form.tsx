@@ -111,7 +111,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
         setMfaEnabled(false);
         setMfaSecret(null);
         
-        toast.success(t('config.security_mfa_disabled'), {
+        toast.info(t('config.security_mfa_disabled'), {
           description: t('config.security_mfa_disabled_desc')
         });
       } catch (error) {
@@ -131,7 +131,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
   
   const handleVerifyMfaCode = async () => {
     if (!mfaCode || mfaCode.length !== 6 || !/^\d+$/.test(mfaCode)) {
-      toast.error(t('config.security_mfa_error'), {
+      toast.warning(t('config.security_mfa_error'), {
         description: "O código deve conter 6 dígitos"
       });
       return;
@@ -164,7 +164,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
   const handleCopySecret = () => {
     if (mfaSecret) {
       navigator.clipboard.writeText(mfaSecret);
-      toast.success("Segredo copiado", {
+      toast.info("Código copiado", {
         description: "O código secreto foi copiado para a área de transferência"
       });
     }
