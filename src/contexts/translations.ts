@@ -56,7 +56,15 @@ type TranslationKey =
   | 'config.security_verifying'
   | 'config.security_active'
   | 'config.success_language'
-  | 'config.error_language';
+  | 'config.error_language'
+  | 'config.security_mfa_enabled'
+  | 'config.security_mfa_setup_desc'
+  | 'config.security_mfa_verified'
+  | 'config.security_mfa_success'
+  | 'config.security_mfa_disabled'
+  | 'config.security_mfa_disabled_desc'
+  | 'config.security_mfa_error'
+  | 'config.security_mfa_error_desc';
 
 type Translations = {
   [key in TranslationKey]: {
@@ -357,5 +365,45 @@ export const translations: Translations = {
     'pt-BR': 'Ocorreu um erro ao alterar o idioma',
     'en-US': 'An error occurred while changing the language',
     'es-ES': 'Se produjo un error al cambiar el idioma',
+  },
+  'config.security_mfa_enabled': {
+    'pt-BR': 'MFA ativado',
+    'en-US': 'MFA enabled',
+    'es-ES': 'MFA activado'
+  },
+  'config.security_mfa_setup_desc': {
+    'pt-BR': 'Configure o aplicativo autenticador usando o QR Code.',
+    'en-US': 'Set up your authenticator app using the QR Code.',
+    'es-ES': 'Configure la aplicación de autenticación usando el código QR.'
+  },
+  'config.security_mfa_verified': {
+    'pt-BR': 'MFA verificado',
+    'en-US': 'MFA verified',
+    'es-ES': 'MFA verificado'
+  },
+  'config.security_mfa_success': {
+    'pt-BR': 'Autenticação de dois fatores ativada com sucesso.',
+    'en-US': 'Two-factor authentication successfully enabled.',
+    'es-ES': 'Autenticación de dos factores activada con éxito.'
+  },
+  'config.security_mfa_disabled': {
+    'pt-BR': 'MFA desativado',
+    'en-US': 'MFA disabled',
+    'es-ES': 'MFA desactivado'
+  },
+  'config.security_mfa_disabled_desc': {
+    'pt-BR': 'Autenticação de dois fatores desativada com sucesso.',
+    'en-US': 'Two-factor authentication successfully disabled.',
+    'es-ES': 'Autenticación de dos factores desactivada con éxito.'
+  },
+  'config.security_mfa_error': {
+    'pt-BR': 'Erro ao configurar MFA',
+    'en-US': 'Error configuring MFA',
+    'es-ES': 'Error al configurar MFA'
+  },
+  'config.security_mfa_error_desc': {
+    'pt-BR': 'Ocorreu um erro ao configurar a autenticação de dois fatores.',
+    'en-US': 'An error occurred while configuring two-factor authentication.',
+    'es-ES': 'Ocurrió un error al configurar la autenticación de dos factores.'
   }
 }; 

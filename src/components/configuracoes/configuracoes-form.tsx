@@ -71,7 +71,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
 
   // URL para o QR Code do MFA (normalmente viria do backend)
   const mfaQrCodeUrl = user.mfaSecret 
-    ? `otpauth://totp/Clinica:${user.email}?secret=${user.mfaSecret}&issuer=Clinica`
+    ? `otpauth://totp/Clinica:${encodeURIComponent(user.email || '')}?secret=${user.mfaSecret}&issuer=Clinica&algorithm=SHA1&digits=6&period=30`
     : "";
 
   const handleMfaToggle = async () => {
@@ -82,29 +82,29 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
         // Aqui seria feita a requisição para gerar o segredo MFA
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        toast.success("MFA ativado", {
-          description: "Configure o aplicativo autenticador usando o QR Code."
+        toast.success(t('config.security_mfa_enabled'), {
+          description: t('config.security_mfa_setup_desc')
         });
       } else if (!mfaEnabled && mfaCode) {
         // Aqui seria feita a validação do código MFA
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        toast.success("MFA verificado", {
-          description: "Autenticação de dois fatores ativada com sucesso."
+        toast.success(t('config.security_mfa_verified'), {
+          description: t('config.security_mfa_success')
         });
       } else {
         // Aqui seria feita a desativação do MFA
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        toast.success("MFA desativado", {
-          description: "Autenticação de dois fatores desativada com sucesso."
+        toast.success(t('config.security_mfa_disabled'), {
+          description: t('config.security_mfa_disabled_desc')
         });
       }
       
       setMfaEnabled(!mfaEnabled);
     } catch (error) {
-      toast.error("Erro ao configurar MFA", {
-        description: "Ocorreu um erro ao configurar a autenticação de dois fatores."
+      toast.error(t('config.security_mfa_error'), {
+        description: t('config.security_mfa_error_desc')
       });
     } finally {
       setLoading(false);
@@ -339,8 +339,15 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                       </p>
                     </div>
                     
-                    <div className="flex justify-center p-4 bg-white rounded-lg">
-                      <QRCodeSVG value={mfaQrCodeUrl} size={200} />
+                    <div className="flex justify-center p-4 bg-white dark:bg-slate-200 rounded-lg">
+                      <QRCodeSVG 
+                        value={mfaQrCodeUrl} 
+                        size={200}
+                        bgColor={"#FFFFFF"} 
+                        fgColor={"#000000"}
+                        level={"H"}
+                        includeMargin={true}
+                      />
                     </div>
                     
                     <div className="space-y-2">
