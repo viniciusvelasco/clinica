@@ -56,6 +56,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
   const { t } = useTranslate();
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingLanguage, setLoadingLanguage] = useState<string | null>(null);
   const [mfaEnabled, setMfaEnabled] = useState(user.mfaEnabled || false);
   const [mfaCode, setMfaCode] = useState("");
   
@@ -111,7 +112,9 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
   };
 
   const handleLanguageChange = async (value: string) => {
-    setLoading(true);
+    if (loadingLanguage) return; // Previne múltiplos cliques
+    
+    setLoadingLanguage(value);
     
     try {
       // Atualiza o idioma no servidor
@@ -145,7 +148,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
         description: t('config.error_language')
       });
     } finally {
-      setLoading(false);
+      setLoadingLanguage(null);
     }
   };
 
@@ -235,7 +238,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                         ? 'bg-primary/10 border-primary ring-2 ring-primary/50' 
                         : 'border-border hover:border-primary/20 hover:bg-muted/50'}`}
                     onClick={() => handleLanguageChange('pt-BR')}
-                    disabled={loading}
+                    disabled={loadingLanguage !== null}
                   >
                     <div className="relative h-20 w-32 overflow-hidden rounded-md shadow-sm mb-3 flex items-center justify-center">
                       <span className="fi fi-br w-full h-full" style={{ transform: 'scale(3)' }} />
@@ -249,7 +252,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                       <span className="font-medium">{t('config.language_pt')}</span>
                       <span className="text-xs text-muted-foreground">{t('config.language_pt_region')}</span>
                     </div>
-                    {loading && language === 'pt-BR' && (
+                    {loadingLanguage === 'pt-BR' && (
                       <Loader2 className="mt-2 h-4 w-4 animate-spin text-primary" />
                     )}
                   </button>
@@ -260,7 +263,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                         ? 'bg-primary/10 border-primary ring-2 ring-primary/50' 
                         : 'border-border hover:border-primary/20 hover:bg-muted/50'}`}
                     onClick={() => handleLanguageChange('en-US')}
-                    disabled={loading}
+                    disabled={loadingLanguage !== null}
                   >
                     <div className="relative h-20 w-32 overflow-hidden rounded-md shadow-sm mb-3 flex items-center justify-center">
                       <span className="fi fi-us w-full h-full" style={{ transform: 'scale(3)' }} />
@@ -274,7 +277,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                       <span className="font-medium">{t('config.language_en')}</span>
                       <span className="text-xs text-muted-foreground">{t('config.language_en_region')}</span>
                     </div>
-                    {loading && language === 'en-US' && (
+                    {loadingLanguage === 'en-US' && (
                       <Loader2 className="mt-2 h-4 w-4 animate-spin text-primary" />
                     )}
                   </button>
@@ -285,7 +288,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                         ? 'bg-primary/10 border-primary ring-2 ring-primary/50' 
                         : 'border-border hover:border-primary/20 hover:bg-muted/50'}`}
                     onClick={() => handleLanguageChange('es-ES')}
-                    disabled={loading}
+                    disabled={loadingLanguage !== null}
                   >
                     <div className="relative h-20 w-32 overflow-hidden rounded-md shadow-sm mb-3 flex items-center justify-center">
                       <span className="fi fi-es w-full h-full" style={{ transform: 'scale(3)' }} />
@@ -299,7 +302,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                       <span className="font-medium">{t('config.language_es')}</span>
                       <span className="text-xs text-muted-foreground">{t('config.language_es_region')}</span>
                     </div>
-                    {loading && language === 'es-ES' && (
+                    {loadingLanguage === 'es-ES' && (
                       <Loader2 className="mt-2 h-4 w-4 animate-spin text-primary" />
                     )}
                   </button>
