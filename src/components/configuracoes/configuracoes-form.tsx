@@ -121,8 +121,15 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
         // Atualiza o idioma no cliente
         setLanguage(value as any);
         
-        toast.success(t('config.success_language'), {
-          description: t('config.success_language')
+        // Usa os textos já traduzidos para o novo idioma
+        const successMessages = {
+          'pt-BR': 'Idioma alterado com sucesso',
+          'en-US': 'Language changed successfully',
+          'es-ES': 'Idioma cambiado con éxito'
+        };
+        
+        toast.success(successMessages[value as keyof typeof successMessages], {
+          description: successMessages[value as keyof typeof successMessages]
         });
         
         // Recarrega a página para aplicar o novo idioma
@@ -133,6 +140,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
         throw new Error("Falha ao atualizar idioma");
       }
     } catch (error) {
+      // Mantém a mensagem de erro no idioma atual
       toast.error(t('config.error_language'), {
         description: t('config.error_language')
       });
