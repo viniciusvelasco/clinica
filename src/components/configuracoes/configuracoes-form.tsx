@@ -41,6 +41,7 @@ import { useLanguage } from "@/contexts/language-context";
 import { useTranslate } from "@/hooks/use-translate";
 import { updateUserLanguage, enableMfa, disableMfa } from "@/actions/user";
 import 'flag-icons/css/flag-icons.min.css';
+import { authenticator } from 'otplib';
 import {
   Dialog,
   DialogContent,
@@ -77,14 +78,6 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
   
   // Efeito para sincronizar estado com propriedades
   useEffect(() => {
-    console.log("Valores MFA recebidos:", { 
-      mfaEnabled: user.mfaEnabled, 
-      mfaSecret: user.mfaSecret,
-      language: user.language,
-      userId: user.id,
-      email: user.email
-    });
-    
     // Atualizar estado com base nos valores recebidos do usuário
     setMfaEnabled(!!user.mfaEnabled);
     setMfaSecret(user.mfaSecret || null);
@@ -107,12 +100,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
 
   // Gerar um segredo MFA aleatório para demonstração
   const generateMfaSecret = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-    let secret = '';
-    for (let i = 0; i < 32; i++) {
-      secret += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return secret;
+    return authenticator.generateSecret();
   };
 
   // URL para o QR Code do MFA
@@ -170,25 +158,8 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
         throw new Error("Código secreto não encontrado");
       }
       
-      console.log("Verificando MFA com os seguintes dados:", {
-        userId: user.id,
-        mfaCode,
-        mfaSecret,
-        userMfaEnabled: user.mfaEnabled
-      });
-      
       // Salvar o segredo no banco de dados
       const result = await enableMfa(mfaSecret);
-      console.log("Resultado da ativação MFA (detalhado):", {
-        success: result.success,
-        error: result.error ? 
-          {
-            name: result.error instanceof Error ? result.error.name : 'Unknown',
-            message: result.error instanceof Error ? result.error.message : String(result.error),
-            stack: result.error instanceof Error ? result.error.stack : undefined
-          } : null,
-        message: result.message
-      });
       
       if (result.success) {
         setMfaEnabled(true);
@@ -198,12 +169,9 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
           description: t('config.security_mfa_success')
         });
       } else {
-        console.error("Erro detalhado ao ativar MFA:", result);
         throw new Error(result.message || "Falha ao ativar MFA");
       }
     } catch (error) {
-      console.error("Erro no handleVerifyMfaCode:", error);
-      
       const errorMessage = error instanceof Error 
         ? error.message 
         : t('config.security_mfa_error_desc');

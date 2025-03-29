@@ -2,6 +2,7 @@
 
 import { db } from '@/lib/db';
 import { auth } from '@/lib/auth';
+import { authenticator } from 'otplib';
 
 /**
  * Atualiza o idioma do usuário no banco de dados
@@ -54,54 +55,26 @@ export async function getUserLanguage() {
  */
 export async function enableMfa(secret: string) {
   try {
-    console.log("Iniciando ativação MFA com segredo:", secret);
-    
     const session = await auth();
-    console.log("Sessão:", session?.user?.id);
     
     if (!session || !session.user) {
-      console.error("Tentativa de ativar MFA sem autenticação");
       throw new Error("Não autorizado");
     }
     
     const userId = session.user.id;
-    console.log("ID do usuário para atualização:", userId);
     
-    // Abordagem simples para atualizar o MFA
+    // Atualizar o MFA
     try {
-      // Usar o Prisma Client diretamente com update
-      const result = await db.user.update({
-        where: { 
-          id: userId 
-        },
+      await db.user.update({
+        where: { id: userId },
         data: { 
           mfaEnabled: true,
           mfaSecret: secret
-        },
-        select: {
-          id: true,
-          mfaEnabled: true,
-          mfaSecret: true
         }
-      });
-      
-      console.log("Atualização MFA bem-sucedida:", {
-        id: result.id,
-        mfaEnabled: result.mfaEnabled,
-        hasMfaSecret: !!result.mfaSecret
       });
       
       return { success: true };
     } catch (updateError) {
-      console.error("Erro específico na atualização do MFA:", updateError);
-      
-      // Log de detalhes adicionais do erro
-      if (updateError instanceof Error) {
-        console.error("Nome:", updateError.name);
-        console.error("Mensagem:", updateError.message);
-        console.error("Stack:", updateError.stack);
-      }
-      
       return { 
         success: false, 
         error: updateError,
@@ -111,8 +84,6 @@ export async function enableMfa(secret: string) {
       };
     }
   } catch (error) {
-    console.error("Erro geral ao ativar MFA:", error);
-    
     return { 
       success: false, 
       error,
@@ -126,54 +97,26 @@ export async function enableMfa(secret: string) {
  */
 export async function disableMfa() {
   try {
-    console.log("Iniciando desativação MFA");
-    
     const session = await auth();
-    console.log("Sessão:", session?.user?.id);
     
     if (!session || !session.user) {
-      console.error("Tentativa de desativar MFA sem autenticação");
       throw new Error("Não autorizado");
     }
     
     const userId = session.user.id;
-    console.log("ID do usuário para atualização:", userId);
     
-    // Abordagem simples para desativar o MFA
+    // Desativar o MFA
     try {
-      // Usar o Prisma Client diretamente com update
-      const result = await db.user.update({
-        where: { 
-          id: userId 
-        },
+      await db.user.update({
+        where: { id: userId },
         data: { 
           mfaEnabled: false,
           mfaSecret: null
-        },
-        select: {
-          id: true,
-          mfaEnabled: true,
-          mfaSecret: true
         }
-      });
-      
-      console.log("Desativação MFA bem-sucedida:", {
-        id: result.id,
-        mfaEnabled: result.mfaEnabled,
-        hasMfaSecret: !!result.mfaSecret
       });
       
       return { success: true };
     } catch (updateError) {
-      console.error("Erro específico na desativação do MFA:", updateError);
-      
-      // Log de detalhes adicionais do erro
-      if (updateError instanceof Error) {
-        console.error("Nome:", updateError.name);
-        console.error("Mensagem:", updateError.message);
-        console.error("Stack:", updateError.stack);
-      }
-      
       return { 
         success: false, 
         error: updateError,
@@ -183,12 +126,53 @@ export async function disableMfa() {
       };
     }
   } catch (error) {
-    console.error("Erro geral ao desativar MFA:", error);
-    
     return { 
       success: false, 
       error,
       message: error instanceof Error ? error.message : "Erro desconhecido" 
+    };
+  }
+}
+
+/**
+ * Verifica um código MFA para um determinado usuário e segredo
+ */
+export async function verifyMfaCode(userId: string, secret: string, code: string) {
+  try {
+    // Verificar se o código tem 6 dígitos
+    if (!code || code.length !== 6 || !/^\d+$/.test(code)) {
+      return { 
+        success: false, 
+        message: "Código inválido" 
+      };
+    }
+    
+    // Usar a biblioteca otplib para verificar o código TOTP
+    try {
+      const isValid = authenticator.verify({ 
+        token: code, 
+        secret: secret 
+      });
+      
+      if (!isValid) {
+        return { 
+          success: false, 
+          message: "Código inválido ou expirado" 
+        };
+      }
+      
+      return { success: true };
+    } catch (verifyError) {
+      return { 
+        success: false, 
+        message: "Erro na verificação do código"
+      };
+    }
+  } catch (error) {
+    return { 
+      success: false, 
+      error,
+      message: error instanceof Error ? error.message : "Erro ao verificar código MFA"
     };
   }
 } 

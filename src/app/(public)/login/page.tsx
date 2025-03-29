@@ -21,6 +21,7 @@ import { LanguageModal } from "@/components/language-modal";
 import { useLanguage } from "@/contexts/language-context";
 import { useTranslate } from "@/hooks/use-translate";
 import { updateUserLanguage } from "@/actions/user";
+import { MfaVerificationModal } from "@/components/auth/mfa-verification-modal";
 import 'flag-icons/css/flag-icons.min.css';
 
 export default function LoginPage() {
@@ -33,6 +34,10 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  
+  // MFA related states
+  const [showMfaModal, setShowMfaModal] = useState(false);
+  const [mfaInfo, setMfaInfo] = useState<{userId: string, secret: string} | null>(null);
 
   // Carregar email do localStorage se existir
   useEffect(() => {
@@ -67,6 +72,20 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
+        // Verificar se o erro é relacionado a MFA
+        if (result.error.startsWith("MFA_REQUIRED:")) {
+          // Formato esperado: "MFA_REQUIRED:userId:secret"
+          const [_, userId, secret] = result.error.split(":");
+          
+          if (userId && secret) {
+            // Iniciar processo de verificação MFA
+            setMfaInfo({ userId, secret });
+            setShowMfaModal(true);
+            setIsLoading(false);
+            return;
+          }
+        }
+        
         setError(t('login.error.invalid_credentials'));
         setIsLoading(false);
         return;
@@ -86,6 +105,18 @@ export default function LoginPage() {
   const handleLanguageSelected = async (selectedLanguage: string) => {
     setShowLanguageModal(false);
   };
+  
+  const handleMfaVerified = async () => {
+    // Depois que o MFA foi verificado com sucesso, continuar o login
+    setShowMfaModal(false);
+    
+    // Guardar idioma preferido do usuário
+    await updateUserLanguage(language);
+    
+    // Redirecionar para o dashboard
+    router.push("/dashboard");
+    router.refresh();
+  };
 
   return (
     <div className="flex min-h-screen bg-white">
@@ -94,6 +125,17 @@ export default function LoginPage() {
         isOpen={showLanguageModal} 
         onClose={handleLanguageSelected} 
       />
+      
+      {/* Modal de verificação MFA */}
+      {mfaInfo && (
+        <MfaVerificationModal
+          isOpen={showMfaModal}
+          onClose={() => setShowMfaModal(false)}
+          onVerified={handleMfaVerified}
+          userId={mfaInfo.userId}
+          mfaSecret={mfaInfo.secret}
+        />
+      )}
 
       {/* Lado esquerdo - 70% */}
       <div className="hidden md:flex md:w-[70%] flex-col items-center justify-center p-0 relative">

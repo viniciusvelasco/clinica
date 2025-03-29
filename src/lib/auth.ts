@@ -4,6 +4,7 @@ import type { NextAuthConfig } from "next-auth";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { signIn as nextAuthSignIn } from "next-auth/react";
+import { authenticator } from "otplib";
 
 import { db } from "@/lib/db";
 
@@ -22,6 +23,7 @@ export const authConfig = {
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Senha", type: "password" },
+        mfaCode: { label: "Código MFA", type: "text" },
       },
       async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) {
@@ -30,9 +32,20 @@ export const authConfig = {
         console.log("Autenticando usuário");
         const email = credentials.email as string;
         const password = credentials.password as string;
+        const mfaCode = credentials.mfaCode as string | undefined;
 
         const user = await db.user.findUnique({
-          where: { email }
+          where: { email },
+          select: {
+            id: true,
+            email: true,
+            password: true,
+            name: true,
+            role: true,
+            image: true,
+            mfaEnabled: true,
+            mfaSecret: true
+          }
         });
         console.log(user);
         if (!user || !user.password) return null;
@@ -40,6 +53,25 @@ export const authConfig = {
         const isPasswordValid = await compare(password, user.password);
 
         if (!isPasswordValid) return null;
+        
+        // Verificar se o usuário tem MFA habilitado
+        if (user.mfaEnabled && user.mfaSecret) {
+          // Se o código MFA não foi fornecido, solicitar verificação MFA
+          if (!mfaCode) {
+            // Formato: "MFA_REQUIRED:userId:secret"
+            throw new Error(`MFA_REQUIRED:${user.id}:${user.mfaSecret}`);
+          }
+          
+          // Se o código foi fornecido, verificar (normalmente com uma biblioteca TOTP)
+          // Por simplicidade, aceitamos qualquer código de 6 dígitos neste exemplo
+          if (!/^\d{6}$/.test(mfaCode)) {
+            return null;
+          }
+          
+          // Em um cenário real, validamos o código MFA aqui:
+          const isValidCode = authenticator.verify({ token: mfaCode, secret: user.mfaSecret });
+          if (!isValidCode) return null;
+        }
 
         // Registrar histórico de acesso
         try {
@@ -120,7 +152,11 @@ export const authConfig = {
 
 export const { handlers, auth, signOut } = NextAuth(authConfig);
 
-export const signIn = async (credentials: { email: string; password: string }, req?: Request) => {
+export const signIn = async (credentials: { 
+  email: string; 
+  password: string;
+  mfaCode?: string;
+}, req?: Request) => {
   try {
     const result = await nextAuthSignIn("credentials", {
       ...credentials,

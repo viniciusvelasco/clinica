@@ -25,13 +25,6 @@ export default async function ConfiguracoesPage() {
       }
     });
     
-    console.log("Dados do usuário carregados:", {
-      id: user?.id,
-      hasMfa: !!user?.mfaEnabled,
-      hasSecret: !!user?.mfaSecret,
-      language: user?.language
-    });
-    
     if (!user) {
       redirect("/login");
     }
@@ -42,8 +35,6 @@ export default async function ConfiguracoesPage() {
       </main>
     );
   } catch (error) {
-    console.error("Erro ao carregar dados do usuário:", error);
-    
     // Em caso de erro, fornecemos um objeto de usuário básico
     return (
       <main className="flex-1">
