@@ -21,7 +21,7 @@ import { LanguageModal } from "@/components/language-modal";
 import { useLanguage } from "@/contexts/language-context";
 import { useTranslate } from "@/hooks/use-translate";
 import { updateUserLanguage } from "@/actions/user";
-import { MfaVerificationModal } from "@/components/auth/mfa-verification-modal";
+import { OTPVerification } from "@/components/auth/otp-verification";
 import 'flag-icons/css/flag-icons.min.css';
 
 export default function LoginPage() {
@@ -31,13 +31,15 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   
   // MFA related states
-  const [showMfaModal, setShowMfaModal] = useState(false);
-  const [mfaInfo, setMfaInfo] = useState<{userId: string, secret: string} | null>(null);
+  const [showMfa, setShowMfa] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [mfaSecret, setMfaSecret] = useState<string | null>(null);
 
   // Carregar email do localStorage se existir
   useEffect(() => {
@@ -53,10 +55,6 @@ export default function LoginPage() {
     setIsLoading(true);
     setError(null);
     
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-
     // Salvar ou remover email do localStorage baseado no checkbox
     if (rememberMe) {
       localStorage.setItem("rememberedEmail", email);
@@ -72,28 +70,25 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        // Verificar se o erro é relacionado a MFA
-        if (result.error.startsWith("MFA_REQUIRED:")) {
-          // Formato esperado: "MFA_REQUIRED:userId:secret"
-          const [_, userId, secret] = result.error.split(":");
-          
-          if (userId && secret) {
-            // Iniciar processo de verificação MFA
-            setMfaInfo({ userId, secret });
-            setShowMfaModal(true);
-            setIsLoading(false);
-            return;
-          }
-        }
-        
         setError(t('login.error.invalid_credentials'));
         setIsLoading(false);
         return;
       }
 
-      // Guardar idioma preferido do usuário
-      await updateUserLanguage(language);
+      // Verificar se o resultado tem flag de MFA necessário
+      const userData = await fetch("/api/auth/session").then(res => res.json());
       
+      if (userData?.user?.mfaRequired) {
+        // Mostrar tela de verificação MFA
+        setUserId(userData.user.id);
+        setMfaSecret(userData.user.mfaSecret);
+        setShowMfa(true);
+        setIsLoading(false);
+        return;
+      }
+
+      // Login normal sem MFA
+      await updateUserLanguage(language);
       router.push("/dashboard");
       router.refresh();
     } catch (error) {
@@ -106,16 +101,39 @@ export default function LoginPage() {
     setShowLanguageModal(false);
   };
   
-  const handleMfaVerified = async () => {
-    // Depois que o MFA foi verificado com sucesso, continuar o login
-    setShowMfaModal(false);
+  const handleVerifyMfa = async (otp: string) => {
+    setIsLoading(true);
     
-    // Guardar idioma preferido do usuário
-    await updateUserLanguage(language);
-    
-    // Redirecionar para o dashboard
-    router.push("/dashboard");
-    router.refresh();
+    try {
+      // Verificar o código OTP
+      const response = await fetch("/api/auth/verify-mfa", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          secret: mfaSecret,
+          code: otp,
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.message || "Código inválido");
+      }
+      
+      // Salvar o idioma do usuário
+      await updateUserLanguage(language);
+      
+      // Redirecionar para o dashboard
+      router.push("/dashboard");
+      router.refresh();
+    } catch (error) {
+      setError(error instanceof Error ? error.message : t('login.error.generic'));
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -125,17 +143,6 @@ export default function LoginPage() {
         isOpen={showLanguageModal} 
         onClose={handleLanguageSelected} 
       />
-      
-      {/* Modal de verificação MFA */}
-      {mfaInfo && (
-        <MfaVerificationModal
-          isOpen={showMfaModal}
-          onClose={() => setShowMfaModal(false)}
-          onVerified={handleMfaVerified}
-          userId={mfaInfo.userId}
-          mfaSecret={mfaInfo.secret}
-        />
-      )}
 
       {/* Lado esquerdo - 70% */}
       <div className="hidden md:flex md:w-[70%] flex-col items-center justify-center p-0 relative">
@@ -269,91 +276,102 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                {t('login.email')}
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                required
-                className="block w-full rounded-md border border-gray-300 px-4 py-2.5 text-gray-900 focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
-                placeholder="seu@email.com"
-              />
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                  {t('login.password')}
+          {showMfa ? (
+            <OTPVerification 
+              onVerify={handleVerifyMfa}
+              isLoading={isLoading}
+            />
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('login.email')}
                 </label>
-                <div className="text-sm">
-                  <a href="#" className="font-medium text-primary hover:text-primary/80">
-                    {t('login.forgot_password')}
-                  </a>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                  required
+                  className="block w-full rounded-md border border-gray-300 px-4 py-2.5 text-gray-900 focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
+                  placeholder="seu@email.com"
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                    {t('login.password')}
+                  </label>
+                  <div className="text-sm">
+                    <a href="#" className="font-medium text-primary hover:text-primary/80">
+                      {t('login.forgot_password')}
+                    </a>
+                  </div>
+                </div>
+                <div className="relative">
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="current-password"
+                    required
+                    className="block w-full rounded-md border border-gray-300 px-4 py-2.5 text-gray-900 focus:border-primary focus:outline-none focus:ring-primary sm:text-sm pr-10"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
                 </div>
               </div>
-              <div className="relative">
+
+              <div className="flex items-center">
                 <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="new-password"
-                  required
-                  className="block w-full rounded-md border border-gray-300 px-4 py-2.5 text-gray-900 focus:border-primary focus:outline-none focus:ring-primary sm:text-sm pr-10"
-                  placeholder="••••••••"
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                 />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
-                </button>
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                  {t('login.remember_me')}
+                </label>
               </div>
-            </div>
 
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                {t('login.remember_me')}
-              </label>
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full bg-primary hover:bg-primary/90 text-white py-2.5"
-              disabled={isLoading}
-            >
-              {isLoading ? t('login.loading') : t('login.submit')}
-            </Button>
-            
-            <div className="mt-4 text-center text-xs text-gray-500">
-              {t('login.terms')}
-              <a href="/politica-privacidade" className="text-primary hover:text-primary/80 mx-1">
-                Termos de Uso e Política de Privacidade
-              </a>
-            </div>
-            
-            {/* Selector de idiomas */}
+              <Button
+                type="submit"
+                className="w-full bg-primary hover:bg-primary/90 text-white py-2.5"
+                disabled={isLoading}
+              >
+                {isLoading ? t('login.loading') : t('login.submit')}
+              </Button>
+              
+              <div className="mt-4 text-center text-xs text-gray-500">
+                {t('login.terms')}
+                <a href="/politica-privacidade" className="text-primary hover:text-primary/80 mx-1">
+                  Termos de Uso e Política de Privacidade
+                </a>
+              </div>
+            </form>
+          )}
+          
+          {/* Selector de idiomas */}
+          <div className="mt-6">
             <LanguageSelector />
-          </form>
+          </div>
         </div>
       </div>
     </div>

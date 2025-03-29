@@ -6,8 +6,7 @@ import { verifyMfaCode } from "@/actions/user";
 import { toast } from "sonner";
 import { Loader2, ShieldCheck, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { OTPVerification } from "@/components/auth/otp-verification";
 import {
   Dialog,
   DialogContent,
@@ -34,10 +33,9 @@ export function MfaVerificationModal({
   mfaSecret
 }: MfaVerificationModalProps) {
   const { t } = useTranslate();
-  const [code, setCode] = useState("");
   const [verifying, setVerifying] = useState(false);
   
-  const handleVerify = async () => {
+  const handleVerify = async (code: string) => {
     if (!code || code.length !== 6 || !/^\d+$/.test(code)) {
       toast.warning(t('auth.mfa_error'), {
         description: t('auth.mfa_code_invalid')
@@ -86,7 +84,6 @@ export function MfaVerificationModal({
       });
     } finally {
       setVerifying(false);
-      setCode("");
     }
   };
 
@@ -100,24 +97,11 @@ export function MfaVerificationModal({
           </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-6 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="mfa-code">
-              {t('auth.mfa_code')}
-            </Label>
-            <Input
-              id="mfa-code"
-              placeholder="000000"
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
-              className="font-mono text-center text-lg tracking-widest"
-              maxLength={6}
-              autoComplete="one-time-code"
-            />
-            <p className="text-xs text-muted-foreground">
-              {t('auth.mfa_code_description')}
-            </p>
-          </div>
+        <div className="py-4">
+          <OTPVerification 
+            onVerify={handleVerify}
+            isLoading={verifying}
+          />
         </div>
         
         <DialogFooter className="sm:justify-between">
@@ -128,22 +112,6 @@ export function MfaVerificationModal({
           >
             <X className="mr-2 h-4 w-4" />
             {t('auth.cancel')}
-          </Button>
-          <Button
-            onClick={handleVerify}
-            disabled={verifying || !code || code.length !== 6}
-          >
-            {verifying ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {t('auth.verifying')}
-              </>
-            ) : (
-              <>
-                <ShieldCheck className="mr-2 h-4 w-4" />
-                {t('auth.verify')}
-              </>
-            )}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -56,21 +56,16 @@ export const authConfig = {
         
         // Verificar se o usuário tem MFA habilitado
         if (user.mfaEnabled && user.mfaSecret) {
-          // Se o código MFA não foi fornecido, solicitar verificação MFA
-          if (!mfaCode) {
-            // Formato: "MFA_REQUIRED:userId:secret"
-            throw new Error(`MFA_REQUIRED:${user.id}:${user.mfaSecret}`);
-          }
-          
-          // Se o código foi fornecido, verificar (normalmente com uma biblioteca TOTP)
-          // Por simplicidade, aceitamos qualquer código de 6 dígitos neste exemplo
-          if (!/^\d{6}$/.test(mfaCode)) {
-            return null;
-          }
-          
-          // Em um cenário real, validamos o código MFA aqui:
-          const isValidCode = authenticator.verify({ token: mfaCode, secret: user.mfaSecret });
-          if (!isValidCode) return null;
+          // Indicar que o usuário precisa de verificação MFA
+          return {
+            id: user.id,
+            email: user.email || "",
+            name: user.name || "",
+            role: user.role || "user",
+            image: user.image || undefined,
+            mfaRequired: true,
+            mfaSecret: user.mfaSecret
+          };
         }
 
         // Registrar histórico de acesso
