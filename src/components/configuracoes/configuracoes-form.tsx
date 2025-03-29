@@ -80,7 +80,9 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
     console.log("Valores MFA recebidos:", { 
       mfaEnabled: user.mfaEnabled, 
       mfaSecret: user.mfaSecret,
-      language: user.language
+      language: user.language,
+      userId: user.id,
+      email: user.email
     });
     
     // Atualizar estado com base nos valores recebidos do usuário
@@ -92,7 +94,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
       setLanguage(user.language as any);
     }
     
-  }, [user.mfaEnabled, user.mfaSecret, user.language, setLanguage]);
+  }, [user.mfaEnabled, user.mfaSecret, user.language, user.id, user.email, setLanguage]);
   
   // Evitar erro de hidratação
   useEffect(() => {
@@ -168,14 +170,25 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
         throw new Error("Código secreto não encontrado");
       }
       
-      // Na prática, você validaria o código contra o segredo aqui
-      // Para demonstração, vamos apenas verificar se possui 6 dígitos
-      
-      console.log("Ativando MFA com segredo:", mfaSecret);
+      console.log("Verificando MFA com os seguintes dados:", {
+        userId: user.id,
+        mfaCode,
+        mfaSecret,
+        userMfaEnabled: user.mfaEnabled
+      });
       
       // Salvar o segredo no banco de dados
       const result = await enableMfa(mfaSecret);
-      console.log("Resultado da ativação MFA:", result);
+      console.log("Resultado da ativação MFA (detalhado):", {
+        success: result.success,
+        error: result.error ? 
+          {
+            name: result.error instanceof Error ? result.error.name : 'Unknown',
+            message: result.error instanceof Error ? result.error.message : String(result.error),
+            stack: result.error instanceof Error ? result.error.stack : undefined
+          } : null,
+        message: result.message
+      });
       
       if (result.success) {
         setMfaEnabled(true);
@@ -185,7 +198,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
           description: t('config.security_mfa_success')
         });
       } else {
-        console.error("Erro ao ativar MFA:", result);
+        console.error("Erro detalhado ao ativar MFA:", result);
         throw new Error(result.message || "Falha ao ativar MFA");
       }
     } catch (error) {
