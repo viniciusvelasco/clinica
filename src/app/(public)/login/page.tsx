@@ -124,6 +124,20 @@ export default function LoginPage() {
         throw new Error(data.message || "Código inválido");
       }
       
+      // Registrar histórico de acesso para usuário com MFA
+      await fetch("/api/auth/registro-acesso", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+        }),
+      }).catch(error => {
+        console.error("Erro ao registrar acesso:", error);
+        // Não bloqueia o processo de login
+      });
+      
       // Salvar o idioma do usuário
       await updateUserLanguage(language);
       
