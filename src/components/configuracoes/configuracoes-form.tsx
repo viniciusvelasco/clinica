@@ -77,35 +77,21 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
   
   // Efeito para sincronizar estado com propriedades
   useEffect(() => {
-    // Log inicial de debug
     console.log("Valores MFA recebidos:", { 
       mfaEnabled: user.mfaEnabled, 
       mfaSecret: user.mfaSecret,
       language: user.language
     });
     
-    // Verificar se há dados de MFA nas propriedades diretas
-    const hasMfaEnabled = !!user.mfaEnabled;
+    // Atualizar estado com base nos valores recebidos do usuário
+    setMfaEnabled(!!user.mfaEnabled);
+    setMfaSecret(user.mfaSecret || null);
     
-    // Verificar alternativa: pode estar armazenado no campo language com prefixo "mfa:"
-    const hasMfaInLanguage = user.language?.startsWith('mfa:');
-    
-    // Extrair segredo do MFA do campo language se estiver lá
-    const extractedSecret = hasMfaInLanguage ? user.language?.substring(4) : null;
-    
-    // Definir estado com base na melhor informação disponível
-    setMfaEnabled(hasMfaEnabled || hasMfaInLanguage || false);
-    setMfaSecret(user.mfaSecret || extractedSecret || null);
-    
-    // Se temos um idioma válido que não seja um segredo MFA, atualizamos o contexto de linguagem
-    if (user.language && !hasMfaInLanguage) {
+    // Atualizar idioma se disponível
+    if (user.language) {
       setLanguage(user.language as any);
     }
     
-    console.log("Estado MFA definido:", {
-      mfaEnabled: hasMfaEnabled || hasMfaInLanguage,
-      mfaSecret: user.mfaSecret || extractedSecret || null
-    });
   }, [user.mfaEnabled, user.mfaSecret, user.language, setLanguage]);
   
   // Evitar erro de hidratação

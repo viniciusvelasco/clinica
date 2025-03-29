@@ -11,34 +11,53 @@ export default async function ConfiguracoesPage() {
     redirect("/login");
   }
   
-  // Buscar dados atualizados do usuário incluindo mfaEnabled e mfaSecret
-  const user = await db.user.findUnique({
-    where: { id: session.user.id },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      language: true
+  // Buscar dados atualizados do usuário incluindo todos os campos necessários
+  try {
+    const user = await db.user.findUnique({
+      where: { id: session.user.id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        language: true,
+        mfaEnabled: true,
+        mfaSecret: true
+      }
+    });
+    
+    console.log("Dados do usuário carregados:", {
+      id: user?.id,
+      hasMfa: !!user?.mfaEnabled,
+      hasSecret: !!user?.mfaSecret,
+      language: user?.language
+    });
+    
+    if (!user) {
+      redirect("/login");
     }
-  });
-  
-  if (!user) {
-    redirect("/login");
+    
+    return (
+      <main className="flex-1">
+        <ConfiguracoesForm user={user} />
+      </main>
+    );
+  } catch (error) {
+    console.error("Erro ao carregar dados do usuário:", error);
+    
+    // Em caso de erro, fornecemos um objeto de usuário básico
+    return (
+      <main className="flex-1">
+        <ConfiguracoesForm 
+          user={{
+            id: session.user.id,
+            name: session.user.name,
+            email: session.user.email,
+            mfaEnabled: false,
+            mfaSecret: null,
+            language: 'pt-BR'
+          }} 
+        />
+      </main>
+    );
   }
-  
-  // Fornecer informações do MFA
-  const userWithMFA = {
-    ...user,
-    // Verificar se o MFA está ativado verificando o prefixo "mfa:" no campo language
-    mfaEnabled: user.language?.startsWith('mfa:') || false,
-    // Extrair o segredo MFA do campo language se existir
-    mfaSecret: user.language?.startsWith('mfa:') ? user.language.substring(4) : null,
-    language: user.language || 'pt-BR'  // Garantir que o language sempre esteja presente
-  };
-  
-  return (
-    <main className="flex-1">
-      <ConfiguracoesForm user={userWithMFA} />
-    </main>
-  );
 } 
