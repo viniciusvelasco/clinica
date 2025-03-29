@@ -46,13 +46,15 @@ model User {
   name          String?
   email         String?   @unique
   emailVerified DateTime?
-  password      String?
   image         String?
+  password      String?
   role          String?   @default("user")
   language      String?   @default("pt-BR")
   accounts      Account[]
   sessions      Session[]
-  historicoAcessos HistoricoAcesso[]
+  mfaEnabled    Boolean   @default(false)
+  mfaSecret     String?
+  historico     HistoricoAcesso[]
 }
 
 model VerificationToken {

@@ -39,7 +39,7 @@ import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
 import { useLanguage } from "@/contexts/language-context";
 import { useTranslate } from "@/hooks/use-translate";
-import { updateUserLanguage } from "@/actions/user";
+import { updateUserLanguage, enableMfa, disableMfa } from "@/actions/user";
 import 'flag-icons/css/flag-icons.min.css';
 import {
   Dialog,
@@ -105,15 +105,19 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
       // Desativar MFA
       setLoading(true);
       try {
-        // Simulando chamada à API para desativar MFA
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Chamar a API para desativar MFA
+        const result = await disableMfa();
         
-        setMfaEnabled(false);
-        setMfaSecret(null);
-        
-        toast.info(t('config.security_mfa_disabled'), {
-          description: t('config.security_mfa_disabled_desc')
-        });
+        if (result.success) {
+          setMfaEnabled(false);
+          setMfaSecret(null);
+          
+          toast.info(t('config.security_mfa_disabled'), {
+            description: t('config.security_mfa_disabled_desc')
+          });
+        } else {
+          throw new Error("Falha ao desativar MFA");
+        }
       } catch (error) {
         toast.error(t('config.security_mfa_error'), {
           description: t('config.security_mfa_error_desc')
@@ -140,17 +144,26 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
     setVerifyingCode(true);
     
     try {
-      // Simulando verificação do código
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      if (!mfaSecret) {
+        throw new Error("Código secreto não encontrado");
+      }
       
-      // Na implementação real, você validaria o código contra o segredo
-      // Para demonstração, consideramos válido
-      setMfaEnabled(true);
-      setShowMfaModal(false);
+      // Na prática, você validaria o código contra o segredo aqui
+      // Para demonstração, vamos apenas verificar se possui 6 dígitos
       
-      toast.success(t('config.security_mfa_verified'), {
-        description: t('config.security_mfa_success')
-      });
+      // Salvar o segredo no banco de dados
+      const result = await enableMfa(mfaSecret);
+      
+      if (result.success) {
+        setMfaEnabled(true);
+        setShowMfaModal(false);
+        
+        toast.success(t('config.security_mfa_verified'), {
+          description: t('config.security_mfa_success')
+        });
+      } else {
+        throw new Error("Falha ao ativar MFA");
+      }
     } catch (error) {
       toast.error(t('config.security_mfa_error'), {
         description: t('config.security_mfa_error_desc')
