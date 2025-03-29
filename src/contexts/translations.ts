@@ -28,7 +28,35 @@ type TranslationKey =
   | 'marketing.security'
   | 'language_modal.title'
   | 'language_modal.subtitle'
-  | 'language_modal.confirm';
+  | 'language_modal.confirm'
+  | 'config.title'
+  | 'config.preferences'
+  | 'config.preferences_subtitle'
+  | 'config.theme'
+  | 'config.theme_light'
+  | 'config.theme_dark'
+  | 'config.theme_system'
+  | 'config.theme_description'
+  | 'config.language'
+  | 'config.language_select'
+  | 'config.language_description'
+  | 'config.language_pt'
+  | 'config.language_pt_region'
+  | 'config.language_en'
+  | 'config.language_en_region'
+  | 'config.language_es'
+  | 'config.language_es_region'
+  | 'config.security'
+  | 'config.security_2fa'
+  | 'config.security_2fa_description'
+  | 'config.security_configure'
+  | 'config.security_configure_description'
+  | 'config.security_code'
+  | 'config.security_verify'
+  | 'config.security_verifying'
+  | 'config.security_active'
+  | 'config.success_language'
+  | 'config.error_language';
 
 type Translations = {
   [key in TranslationKey]: {
@@ -189,5 +217,145 @@ export const translations: Translations = {
     'pt-BR': 'Confirmar',
     'en-US': 'Confirm',
     'es-ES': 'Confirmar',
+  },
+  'config.title': {
+    'pt-BR': 'Configurações',
+    'en-US': 'Settings',
+    'es-ES': 'Configuración',
+  },
+  'config.preferences': {
+    'pt-BR': 'Preferências do Sistema',
+    'en-US': 'System Preferences',
+    'es-ES': 'Preferencias del Sistema',
+  },
+  'config.preferences_subtitle': {
+    'pt-BR': 'Personalize as configurações do sistema',
+    'en-US': 'Customize system settings',
+    'es-ES': 'Personaliza la configuración del sistema',
+  },
+  'config.theme': {
+    'pt-BR': 'Tema',
+    'en-US': 'Theme',
+    'es-ES': 'Tema',
+  },
+  'config.theme_light': {
+    'pt-BR': 'Claro',
+    'en-US': 'Light',
+    'es-ES': 'Claro',
+  },
+  'config.theme_dark': {
+    'pt-BR': 'Escuro',
+    'en-US': 'Dark',
+    'es-ES': 'Oscuro',
+  },
+  'config.theme_system': {
+    'pt-BR': 'Sistema',
+    'en-US': 'System',
+    'es-ES': 'Sistema',
+  },
+  'config.theme_description': {
+    'pt-BR': 'Escolha entre o tema claro, escuro ou siga as configurações do seu sistema.',
+    'en-US': 'Choose between light, dark theme or follow your system settings.',
+    'es-ES': 'Elige entre el tema claro, oscuro o sigue la configuración de tu sistema.',
+  },
+  'config.language': {
+    'pt-BR': 'Idioma',
+    'en-US': 'Language',
+    'es-ES': 'Idioma',
+  },
+  'config.language_select': {
+    'pt-BR': 'Selecione o idioma',
+    'en-US': 'Select language',
+    'es-ES': 'Selecciona el idioma',
+  },
+  'config.language_description': {
+    'pt-BR': 'O idioma selecionado será aplicado em toda a interface do sistema.',
+    'en-US': 'The selected language will be applied throughout the system interface.',
+    'es-ES': 'El idioma seleccionado se aplicará en toda la interfaz del sistema.',
+  },
+  'config.language_pt': {
+    'pt-BR': 'Português',
+    'en-US': 'Portuguese',
+    'es-ES': 'Portugués',
+  },
+  'config.language_pt_region': {
+    'pt-BR': 'Brasil',
+    'en-US': 'Brazil',
+    'es-ES': 'Brasil',
+  },
+  'config.language_en': {
+    'pt-BR': 'Inglês',
+    'en-US': 'English',
+    'es-ES': 'Inglés',
+  },
+  'config.language_en_region': {
+    'pt-BR': 'Estados Unidos',
+    'en-US': 'United States',
+    'es-ES': 'Estados Unidos',
+  },
+  'config.language_es': {
+    'pt-BR': 'Espanhol',
+    'en-US': 'Spanish',
+    'es-ES': 'Español',
+  },
+  'config.language_es_region': {
+    'pt-BR': 'Espanha',
+    'en-US': 'Spain',
+    'es-ES': 'España',
+  },
+  'config.security': {
+    'pt-BR': 'Segurança',
+    'en-US': 'Security',
+    'es-ES': 'Seguridad',
+  },
+  'config.security_2fa': {
+    'pt-BR': 'Autenticação de dois fatores (2FA)',
+    'en-US': 'Two-factor authentication (2FA)',
+    'es-ES': 'Autenticación de dos factores (2FA)',
+  },
+  'config.security_2fa_description': {
+    'pt-BR': 'Adicione uma camada extra de segurança à sua conta.',
+    'en-US': 'Add an extra layer of security to your account.',
+    'es-ES': 'Añade una capa adicional de seguridad a tu cuenta.',
+  },
+  'config.security_configure': {
+    'pt-BR': 'Configure o autenticador',
+    'en-US': 'Configure authenticator',
+    'es-ES': 'Configura el autenticador',
+  },
+  'config.security_configure_description': {
+    'pt-BR': 'Escaneie o QR Code abaixo com seu aplicativo autenticador (Google Authenticator, Authy, etc).',
+    'en-US': 'Scan the QR Code below with your authenticator app (Google Authenticator, Authy, etc).',
+    'es-ES': 'Escanea el código QR con tu aplicación de autenticación (Google Authenticator, Authy, etc).',
+  },
+  'config.security_code': {
+    'pt-BR': 'Digite o código gerado no aplicativo',
+    'en-US': 'Enter the code generated in the app',
+    'es-ES': 'Introduce el código generado en la aplicación',
+  },
+  'config.security_verify': {
+    'pt-BR': 'Verificar',
+    'en-US': 'Verify',
+    'es-ES': 'Verificar',
+  },
+  'config.security_verifying': {
+    'pt-BR': 'Verificando...',
+    'en-US': 'Verifying...',
+    'es-ES': 'Verificando...',
+  },
+  'config.security_active': {
+    'pt-BR': 'Autenticação de dois fatores está ativa',
+    'en-US': 'Two-factor authentication is active',
+    'es-ES': 'La autenticación de dos factores está activa',
+  },
+  'config.success_language': {
+    'pt-BR': 'Idioma alterado com sucesso',
+    'en-US': 'Language changed successfully',
+    'es-ES': 'Idioma cambiado con éxito',
+  },
+  'config.error_language': {
+    'pt-BR': 'Ocorreu um erro ao alterar o idioma',
+    'en-US': 'An error occurred while changing the language',
+    'es-ES': 'Se produjo un error al cambiar el idioma',
   }
 }; 

@@ -35,6 +35,7 @@ import {
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
 import { useLanguage } from "@/contexts/language-context";
+import { useTranslate } from "@/hooks/use-translate";
 import { updateUserLanguage } from "@/actions/user";
 import 'flag-icons/css/flag-icons.min.css';
 
@@ -52,6 +53,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const { language, setLanguage } = useLanguage();
+  const { t } = useTranslate();
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mfaEnabled, setMfaEnabled] = useState(user.mfaEnabled || false);
@@ -119,8 +121,8 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
         // Atualiza o idioma no cliente
         setLanguage(value as any);
         
-        toast.success("Idioma alterado", {
-          description: "O idioma foi alterado com sucesso."
+        toast.success(t('config.success_language'), {
+          description: t('config.success_language')
         });
         
         // Recarrega a página para aplicar o novo idioma
@@ -131,8 +133,8 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
         throw new Error("Falha ao atualizar idioma");
       }
     } catch (error) {
-      toast.error("Erro ao alterar idioma", {
-        description: "Ocorreu um erro ao alterar o idioma."
+      toast.error(t('config.error_language'), {
+        description: t('config.error_language')
       });
     } finally {
       setLoading(false);
@@ -141,12 +143,12 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
 
   return (
     <div className="container mx-auto py-6">
-      <h1 className="text-2xl font-bold mb-6 text-foreground">Configurações</h1>
+      <h1 className="text-2xl font-bold mb-6 text-foreground">{t('config.title')}</h1>
       
       <Card className="border-primary/10 shadow-sm">
         <CardHeader className="bg-primary/10 px-5 py-3 rounded-t-lg">
-          <CardTitle className="text-base">Preferências do Sistema</CardTitle>
-          <CardDescription className="text-xs">Personalize as configurações do sistema</CardDescription>
+          <CardTitle className="text-base">{t('config.preferences')}</CardTitle>
+          <CardDescription className="text-xs">{t('config.preferences_subtitle')}</CardDescription>
         </CardHeader>
         <CardContent className="p-5">
           <Tabs defaultValue="tema" className="w-full">
@@ -156,21 +158,21 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                 className="rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:font-medium flex items-center justify-center py-2 gap-2 transition-all duration-200 text-sm"
               >
                 <Palette className="h-4 w-4" />
-                Tema
+                {t('config.theme')}
               </TabsTrigger>
               <TabsTrigger 
                 value="idioma" 
                 className="rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:font-medium flex items-center justify-center py-2 gap-2 transition-all duration-200 text-sm"
               >
                 <Globe2 className="h-4 w-4" />
-                Idioma
+                {t('config.language')}
               </TabsTrigger>
               <TabsTrigger 
                 value="seguranca" 
                 className="rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:font-medium flex items-center justify-center py-2 gap-2 transition-all duration-200 text-sm"
               >
                 <Shield className="h-4 w-4" />
-                Segurança
+                {t('config.security')}
               </TabsTrigger>
             </TabsList>
             
@@ -183,7 +185,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                   >
                     <CardContent className="p-4 flex flex-col items-center gap-2">
                       <Sun className="h-6 w-6 text-primary" />
-                      <span className="text-sm font-medium">Claro</span>
+                      <span className="text-sm font-medium">{t('config.theme_light')}</span>
                     </CardContent>
                   </Card>
                   
@@ -193,7 +195,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                   >
                     <CardContent className="p-4 flex flex-col items-center gap-2">
                       <Moon className="h-6 w-6 text-primary" />
-                      <span className="text-sm font-medium">Escuro</span>
+                      <span className="text-sm font-medium">{t('config.theme_dark')}</span>
                     </CardContent>
                   </Card>
                   
@@ -203,20 +205,20 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                   >
                     <CardContent className="p-4 flex flex-col items-center gap-2">
                       <Monitor className="h-6 w-6 text-primary" />
-                      <span className="text-sm font-medium">Sistema</span>
+                      <span className="text-sm font-medium">{t('config.theme_system')}</span>
                     </CardContent>
                   </Card>
                 </div>
                 
                 <p className="text-xs text-muted-foreground">
-                  Escolha entre o tema claro, escuro ou siga as configurações do seu sistema.
+                  {t('config.theme_description')}
                 </p>
               </div>
             </TabsContent>
             
             <TabsContent value="idioma" className="space-y-4 animate-in fade-in-50">
               <div className="space-y-4">
-                <Label className="text-sm font-medium">Selecione o idioma</Label>
+                <Label className="text-sm font-medium">{t('config.language_select')}</Label>
                 
                 <div className="flex flex-row justify-center gap-4">
                   <button
@@ -228,7 +230,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                     disabled={loading}
                   >
                     <div className="relative h-20 w-32 overflow-hidden rounded-md shadow-sm mb-3 flex items-center justify-center">
-                      <span className="fi fi-br w-full h-full" style={{ transform: 'scale(1.4)' }} />
+                      <span className="fi fi-br w-full h-full" style={{ transform: 'scale(3)' }} />
                       {language === 'pt-BR' && (
                         <div className="absolute right-2 bottom-2 bg-primary rounded-full p-1 z-10">
                           <Check className="h-4 w-4 text-white" />
@@ -236,8 +238,8 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                       )}
                     </div>
                     <div className="flex flex-col items-center text-center">
-                      <span className="font-medium">Português</span>
-                      <span className="text-xs text-muted-foreground">Brasil</span>
+                      <span className="font-medium">{t('config.language_pt')}</span>
+                      <span className="text-xs text-muted-foreground">{t('config.language_pt_region')}</span>
                     </div>
                     {loading && language === 'pt-BR' && (
                       <Loader2 className="mt-2 h-4 w-4 animate-spin text-primary" />
@@ -253,7 +255,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                     disabled={loading}
                   >
                     <div className="relative h-20 w-32 overflow-hidden rounded-md shadow-sm mb-3 flex items-center justify-center">
-                      <span className="fi fi-us w-full h-full" style={{ transform: 'scale(1.4)' }} />
+                      <span className="fi fi-us w-full h-full" style={{ transform: 'scale(3)' }} />
                       {language === 'en-US' && (
                         <div className="absolute right-2 bottom-2 bg-primary rounded-full p-1 z-10">
                           <Check className="h-4 w-4 text-white" />
@@ -261,8 +263,8 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                       )}
                     </div>
                     <div className="flex flex-col items-center text-center">
-                      <span className="font-medium">English</span>
-                      <span className="text-xs text-muted-foreground">United States</span>
+                      <span className="font-medium">{t('config.language_en')}</span>
+                      <span className="text-xs text-muted-foreground">{t('config.language_en_region')}</span>
                     </div>
                     {loading && language === 'en-US' && (
                       <Loader2 className="mt-2 h-4 w-4 animate-spin text-primary" />
@@ -278,7 +280,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                     disabled={loading}
                   >
                     <div className="relative h-20 w-32 overflow-hidden rounded-md shadow-sm mb-3 flex items-center justify-center">
-                      <span className="fi fi-es w-full h-full" style={{ transform: 'scale(1.4)' }} />
+                      <span className="fi fi-es w-full h-full" style={{ transform: 'scale(3)' }} />
                       {language === 'es-ES' && (
                         <div className="absolute right-2 bottom-2 bg-primary rounded-full p-1 z-10">
                           <Check className="h-4 w-4 text-white" />
@@ -286,8 +288,8 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                       )}
                     </div>
                     <div className="flex flex-col items-center text-center">
-                      <span className="font-medium">Español</span>
-                      <span className="text-xs text-muted-foreground">España</span>
+                      <span className="font-medium">{t('config.language_es')}</span>
+                      <span className="text-xs text-muted-foreground">{t('config.language_es_region')}</span>
                     </div>
                     {loading && language === 'es-ES' && (
                       <Loader2 className="mt-2 h-4 w-4 animate-spin text-primary" />
@@ -296,7 +298,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                 </div>
                 
                 <p className="text-xs text-muted-foreground text-center">
-                  O idioma selecionado será aplicado em toda a interface do sistema.
+                  {t('config.language_description')}
                 </p>
               </div>
             </TabsContent>
@@ -305,9 +307,9 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <Label className="text-sm font-medium">Autenticação de dois fatores (2FA)</Label>
+                    <Label className="text-sm font-medium">{t('config.security_2fa')}</Label>
                     <p className="text-xs text-muted-foreground">
-                      Adicione uma camada extra de segurança à sua conta.
+                      {t('config.security_2fa_description')}
                     </p>
                   </div>
                   <Switch
@@ -320,9 +322,9 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                 {mfaEnabled && !user.mfaSecret && (
                   <div className="space-y-4 border rounded-lg p-4 bg-muted/10">
                     <div className="space-y-2">
-                      <Label className="text-sm font-medium">Configure o autenticador</Label>
+                      <Label className="text-sm font-medium">{t('config.security_configure')}</Label>
                       <p className="text-xs text-muted-foreground">
-                        Escaneie o QR Code abaixo com seu aplicativo autenticador (Google Authenticator, Authy, etc).
+                        {t('config.security_configure_description')}
                       </p>
                     </div>
                     
@@ -332,7 +334,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                     
                     <div className="space-y-2">
                       <Label htmlFor="mfa-code" className="text-xs font-medium">
-                        Digite o código gerado no aplicativo
+                        {t('config.security_code')}
                       </Label>
                       <div className="flex gap-2">
                         <Input
@@ -352,12 +354,12 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                           {loading ? (
                             <>
                               <Loader2 className="mr-2 h-3 w-3 animate-spin" />
-                              <span>Verificando...</span>
+                              <span>{t('config.security_verifying')}</span>
                             </>
                           ) : (
                             <>
                               <ShieldCheck className="mr-2 h-3 w-3" />
-                              <span>Verificar</span>
+                              <span>{t('config.security_verify')}</span>
                             </>
                           )}
                         </Button>
@@ -369,7 +371,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                 {mfaEnabled && user.mfaSecret && (
                   <div className="flex items-center gap-2 text-sm text-green-500">
                     <ShieldCheck className="h-4 w-4" />
-                    <span>Autenticação de dois fatores está ativa</span>
+                    <span>{t('config.security_active')}</span>
                   </div>
                 )}
               </div>
