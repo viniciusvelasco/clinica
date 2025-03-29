@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
 import { 
   Card, 
   CardContent, 
@@ -34,6 +35,7 @@ import {
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
 import { useLanguage } from "@/contexts/language-context";
+import { updateUserLanguage } from "@/actions/user";
 import 'flag-icons/css/flag-icons.min.css';
 
 interface ConfiguracoesFormProps {
@@ -47,6 +49,7 @@ interface ConfiguracoesFormProps {
 }
 
 export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
+  const router = useRouter();
   const { theme, setTheme } = useTheme();
   const { language, setLanguage } = useLanguage();
   const [mounted, setMounted] = useState(false);
@@ -109,14 +112,24 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
     setLoading(true);
     
     try {
-      // Aqui seria feita a atualização do idioma no servidor
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Atualiza o idioma no servidor
+      const result = await updateUserLanguage(value);
       
-      setLanguage(value as any);
-      
-      toast.success("Idioma alterado", {
-        description: "O idioma foi alterado com sucesso."
-      });
+      if (result.success) {
+        // Atualiza o idioma no cliente
+        setLanguage(value as any);
+        
+        toast.success("Idioma alterado", {
+          description: "O idioma foi alterado com sucesso."
+        });
+        
+        // Recarrega a página para aplicar o novo idioma
+        setTimeout(() => {
+          router.refresh();
+        }, 1000);
+      } else {
+        throw new Error("Falha ao atualizar idioma");
+      }
     } catch (error) {
       toast.error("Erro ao alterar idioma", {
         description: "Ocorreu um erro ao alterar o idioma."
@@ -214,10 +227,10 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                     onClick={() => handleLanguageChange('pt-BR')}
                     disabled={loading}
                   >
-                    <div className="relative h-20 w-32 overflow-hidden rounded-md shadow-sm mb-3">
-                      <span className="fi fi-br absolute inset-0" />
+                    <div className="relative h-20 w-32 overflow-hidden rounded-md shadow-sm mb-3 flex items-center justify-center">
+                      <span className="fi fi-br w-full h-full" style={{ transform: 'scale(1.4)' }} />
                       {language === 'pt-BR' && (
-                        <div className="absolute right-2 bottom-2 bg-primary rounded-full p-1">
+                        <div className="absolute right-2 bottom-2 bg-primary rounded-full p-1 z-10">
                           <Check className="h-4 w-4 text-white" />
                         </div>
                       )}
@@ -239,10 +252,10 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                     onClick={() => handleLanguageChange('en-US')}
                     disabled={loading}
                   >
-                    <div className="relative h-20 w-32 overflow-hidden rounded-md shadow-sm mb-3">
-                      <span className="fi fi-us absolute inset-0" />
+                    <div className="relative h-20 w-32 overflow-hidden rounded-md shadow-sm mb-3 flex items-center justify-center">
+                      <span className="fi fi-us w-full h-full" style={{ transform: 'scale(1.4)' }} />
                       {language === 'en-US' && (
-                        <div className="absolute right-2 bottom-2 bg-primary rounded-full p-1">
+                        <div className="absolute right-2 bottom-2 bg-primary rounded-full p-1 z-10">
                           <Check className="h-4 w-4 text-white" />
                         </div>
                       )}
@@ -264,10 +277,10 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                     onClick={() => handleLanguageChange('es-ES')}
                     disabled={loading}
                   >
-                    <div className="relative h-20 w-32 overflow-hidden rounded-md shadow-sm mb-3">
-                      <span className="fi fi-es absolute inset-0" />
+                    <div className="relative h-20 w-32 overflow-hidden rounded-md shadow-sm mb-3 flex items-center justify-center">
+                      <span className="fi fi-es w-full h-full" style={{ transform: 'scale(1.4)' }} />
                       {language === 'es-ES' && (
-                        <div className="absolute right-2 bottom-2 bg-primary rounded-full p-1">
+                        <div className="absolute right-2 bottom-2 bg-primary rounded-full p-1 z-10">
                           <Check className="h-4 w-4 text-white" />
                         </div>
                       )}
