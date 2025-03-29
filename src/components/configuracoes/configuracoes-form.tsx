@@ -38,7 +38,7 @@ import {
   Palette,
 } from "lucide-react";
 import { toast } from "sonner";
-import QRCode from "qrcode.react";
+import { QRCodeSVG } from "qrcode.react";
 
 interface ConfiguracoesFormProps {
   user: {
@@ -242,7 +242,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                     </div>
                     
                     <div className="flex justify-center p-4 bg-white rounded-lg">
-                      <QRCode value={mfaQrCodeUrl} size={200} />
+                      <QRCodeSVG value={mfaQrCodeUrl} size={200} />
                     </div>
                     
                     <div className="space-y-2">
