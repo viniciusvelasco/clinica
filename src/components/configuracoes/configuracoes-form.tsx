@@ -68,11 +68,22 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingLanguage, setLoadingLanguage] = useState<string | null>(null);
-  const [mfaEnabled, setMfaEnabled] = useState(user.mfaEnabled || false);
+  const [mfaEnabled, setMfaEnabled] = useState(false);
   const [mfaCode, setMfaCode] = useState("");
   const [showMfaModal, setShowMfaModal] = useState(false);
   const [mfaSecret, setMfaSecret] = useState<string | null>(null);
   const [verifyingCode, setVerifyingCode] = useState(false);
+  
+  // Efeito para sincronizar estado com propriedades
+  useEffect(() => {
+    console.log("Valores MFA recebidos:", { 
+      mfaEnabled: user.mfaEnabled, 
+      mfaSecret: user.mfaSecret 
+    });
+    
+    setMfaEnabled(!!user.mfaEnabled);
+    setMfaSecret(user.mfaSecret || null);
+  }, [user.mfaEnabled, user.mfaSecret]);
   
   // Evitar erro de hidratação
   useEffect(() => {
