@@ -54,24 +54,49 @@ export async function getUserLanguage() {
  */
 export async function enableMfa(secret: string) {
   try {
+    console.log("Ativando MFA com segredo:", secret);
+    
     const session = await auth();
+    console.log("Sessão:", session);
     
     if (!session || !session.user) {
+      console.error("Sessão inválida ou usuário não autenticado");
       throw new Error("Não autorizado");
     }
     
-    await db.user.update({
+    console.log("ID do usuário:", session.user.id);
+    
+    const updatedUser = await db.user.update({
       where: { id: session.user.id },
       data: { 
-        mfaSecret: secret,
-        mfaEnabled: true
+        mfaEnabled: true,
+        mfaSecret: secret
+      },
+      select: {
+        id: true,
+        mfaEnabled: true,
+        mfaSecret: true
       }
     });
+    
+    console.log("Usuário atualizado:", updatedUser);
     
     return { success: true };
   } catch (error) {
     console.error("Erro ao ativar MFA:", error);
-    return { success: false, error };
+    
+    // Logar detalhes adicionais do erro
+    if (error instanceof Error) {
+      console.error("Nome do erro:", error.name);
+      console.error("Mensagem do erro:", error.message);
+      console.error("Stack trace:", error.stack);
+    }
+    
+    return { 
+      success: false, 
+      error,
+      message: error instanceof Error ? error.message : "Erro desconhecido" 
+    };
   }
 }
 

@@ -151,8 +151,11 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
       // Na prática, você validaria o código contra o segredo aqui
       // Para demonstração, vamos apenas verificar se possui 6 dígitos
       
+      console.log("Ativando MFA com segredo:", mfaSecret);
+      
       // Salvar o segredo no banco de dados
       const result = await enableMfa(mfaSecret);
+      console.log("Resultado da ativação MFA:", result);
       
       if (result.success) {
         setMfaEnabled(true);
@@ -162,11 +165,18 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
           description: t('config.security_mfa_success')
         });
       } else {
-        throw new Error("Falha ao ativar MFA");
+        console.error("Erro ao ativar MFA:", result);
+        throw new Error(result.message || "Falha ao ativar MFA");
       }
     } catch (error) {
+      console.error("Erro no handleVerifyMfaCode:", error);
+      
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : t('config.security_mfa_error_desc');
+        
       toast.error(t('config.security_mfa_error'), {
-        description: t('config.security_mfa_error_desc')
+        description: errorMessage
       });
     } finally {
       setVerifyingCode(false);
