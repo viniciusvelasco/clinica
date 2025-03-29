@@ -64,7 +64,14 @@ type TranslationKey =
   | 'config.security_mfa_disabled'
   | 'config.security_mfa_disabled_desc'
   | 'config.security_mfa_error'
-  | 'config.security_mfa_error_desc';
+  | 'config.security_mfa_error_desc'
+  | 'config.security_code_error'
+  | 'config.security_code_secret'
+  | 'config.security_code_copied'
+  | 'config.security_code_copied_desc'
+  | 'config.security_code_manual'
+  | 'config.security_code_digit_desc'
+  | 'config.security_cancel';
 
 type Translations = {
   [key in TranslationKey]: {
@@ -405,5 +412,40 @@ export const translations: Translations = {
     'pt-BR': 'Ocorreu um erro ao configurar a autenticação de dois fatores.',
     'en-US': 'An error occurred while configuring two-factor authentication.',
     'es-ES': 'Ocurrió un error al configurar la autenticación de dos factores.'
+  },
+  'config.security_code_error': {
+    'pt-BR': 'O código deve conter 6 dígitos',
+    'en-US': 'The code must contain 6 digits',
+    'es-ES': 'El código debe contener 6 dígitos'
+  },
+  'config.security_code_secret': {
+    'pt-BR': 'Código secreto',
+    'en-US': 'Secret code',
+    'es-ES': 'Código secreto'
+  },
+  'config.security_code_copied': {
+    'pt-BR': 'Código copiado',
+    'en-US': 'Code copied',
+    'es-ES': 'Código copiado'
+  },
+  'config.security_code_copied_desc': {
+    'pt-BR': 'O código secreto foi copiado para a área de transferência',
+    'en-US': 'The secret code was copied to the clipboard',
+    'es-ES': 'El código secreto fue copiado al portapapeles'
+  },
+  'config.security_code_manual': {
+    'pt-BR': 'Se não conseguir escanear o QR code, digite este código no seu aplicativo.',
+    'en-US': 'If you cannot scan the QR code, enter this code in your app.',
+    'es-ES': 'Si no puede escanear el código QR, ingrese este código en su aplicación.'
+  },
+  'config.security_code_digit_desc': {
+    'pt-BR': 'Digite o código de 6 dígitos exibido no seu aplicativo autenticador.',
+    'en-US': 'Enter the 6-digit code shown in your authenticator app.',
+    'es-ES': 'Ingrese el código de 6 dígitos que aparece en su aplicación de autenticación.'
+  },
+  'config.security_cancel': {
+    'pt-BR': 'Cancelar',
+    'en-US': 'Cancel',
+    'es-ES': 'Cancelar'
   }
 }; 

@@ -132,7 +132,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
   const handleVerifyMfaCode = async () => {
     if (!mfaCode || mfaCode.length !== 6 || !/^\d+$/.test(mfaCode)) {
       toast.warning(t('config.security_mfa_error'), {
-        description: "O código deve conter 6 dígitos"
+        description: t('config.security_code_error')
       });
       return;
     }
@@ -164,8 +164,8 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
   const handleCopySecret = () => {
     if (mfaSecret) {
       navigator.clipboard.writeText(mfaSecret);
-      toast.info("Código copiado", {
-        description: "O código secreto foi copiado para a área de transferência"
+      toast.info(t('config.security_code_copied'), {
+        description: t('config.security_code_copied_desc')
       });
     }
   };
@@ -430,7 +430,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
             
             {/* Código secreto */}
             <div className="space-y-2">
-              <Label>Código secreto</Label>
+              <Label>{t('config.security_code_secret')}</Label>
               <div className="flex items-center space-x-2">
                 <div className="bg-muted p-2 rounded-md text-center flex-1 font-mono text-sm break-all">
                   {mfaSecret?.match(/.{1,4}/g)?.join(' ')}
@@ -439,13 +439,13 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                   variant="outline" 
                   size="icon" 
                   onClick={handleCopySecret}
-                  title="Copiar código"
+                  title={t('config.security_code_copied')}
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">
-                Se não conseguir escanear o QR code, digite este código no seu aplicativo.
+                {t('config.security_code_manual')}
               </p>
             </div>
             
@@ -463,7 +463,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
                 maxLength={6}
               />
               <p className="text-xs text-muted-foreground">
-                Digite o código de 6 dígitos exibido no seu aplicativo autenticador.
+                {t('config.security_code_digit_desc')}
               </p>
             </div>
           </div>
@@ -479,7 +479,7 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
               disabled={verifyingCode}
             >
               <X className="mr-2 h-4 w-4" />
-              Cancelar
+              {t('config.security_cancel')}
             </Button>
             <Button 
               onClick={handleVerifyMfaCode}
