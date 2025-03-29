@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 import { 
   Card, 
@@ -52,11 +52,21 @@ interface ConfiguracoesFormProps {
 
 export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mfaEnabled, setMfaEnabled] = useState(user.mfaEnabled || false);
   const [mfaCode, setMfaCode] = useState("");
   const [idioma, setIdioma] = useState("pt-BR");
   
+  // Evitar erro de hidratação
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
+
   // URL para o QR Code do MFA (normalmente viria do backend)
   const mfaQrCodeUrl = user.mfaSecret 
     ? `otpauth://totp/Clinica:${user.email}?secret=${user.mfaSecret}&issuer=Clinica`

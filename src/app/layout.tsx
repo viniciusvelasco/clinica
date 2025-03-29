@@ -2,7 +2,7 @@ import "@/app/globals.css";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { Roboto } from "next/font/google";
-import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 import { LanguageProvider } from '@/contexts/language-context';
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "@/components/ui/sonner";
