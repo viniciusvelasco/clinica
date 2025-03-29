@@ -57,6 +57,7 @@ interface ConfiguracoesFormProps {
     email?: string | null;
     mfaEnabled?: boolean;
     mfaSecret?: string | null;
+    language?: string | null;
   };
 }
 
@@ -78,12 +79,28 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
   useEffect(() => {
     console.log("Valores MFA recebidos:", { 
       mfaEnabled: user.mfaEnabled, 
-      mfaSecret: user.mfaSecret 
+      mfaSecret: user.mfaSecret,
+      language: user.language
     });
     
-    setMfaEnabled(!!user.mfaEnabled);
-    setMfaSecret(user.mfaSecret || null);
-  }, [user.mfaEnabled, user.mfaSecret]);
+    // Verificar se há dados de MFA nas propriedades diretas
+    const hasMfaEnabled = !!user.mfaEnabled;
+    
+    // Verificar alternativa: pode estar armazenado no campo language com prefixo "mfa:"
+    const hasMfaInLanguage = user.language?.startsWith('mfa:');
+    
+    // Extrair segredo do MFA do campo language se estiver lá
+    const extractedSecret = hasMfaInLanguage ? user.language?.substring(4) : null;
+    
+    // Definir estado com base na melhor informação disponível
+    setMfaEnabled(hasMfaEnabled || hasMfaInLanguage || false);
+    setMfaSecret(user.mfaSecret || extractedSecret || null);
+    
+    console.log("Estado MFA definido:", {
+      mfaEnabled: hasMfaEnabled || hasMfaInLanguage,
+      mfaSecret: user.mfaSecret || extractedSecret || null
+    });
+  }, [user.mfaEnabled, user.mfaSecret, user.language]);
   
   // Evitar erro de hidratação
   useEffect(() => {

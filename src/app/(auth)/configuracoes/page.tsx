@@ -30,7 +30,8 @@ export default async function ConfiguracoesPage() {
   const userWithMFA = {
     ...user,
     mfaEnabled: false,  // Valor padrão, será sobrescrito no cliente
-    mfaSecret: null
+    mfaSecret: null,
+    language: user.language || 'pt-BR'  // Garantir que o language sempre esteja presente
   };
   
   return (
