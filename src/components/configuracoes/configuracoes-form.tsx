@@ -8,7 +8,8 @@ import {
   CardContent, 
   CardDescription, 
   CardHeader, 
-  CardTitle 
+  CardTitle,
+  CardFooter 
 } from "@/components/ui/card";
 import {
   Tabs,
@@ -31,6 +32,8 @@ import {
   ShieldAlert,
   Palette,
   Check,
+  X,
+  Copy,
 } from "lucide-react";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
@@ -38,6 +41,14 @@ import { useLanguage } from "@/contexts/language-context";
 import { useTranslate } from "@/hooks/use-translate";
 import { updateUserLanguage } from "@/actions/user";
 import 'flag-icons/css/flag-icons.min.css';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 interface ConfiguracoesFormProps {
   user: {
@@ -59,6 +70,9 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
   const [loadingLanguage, setLoadingLanguage] = useState<string | null>(null);
   const [mfaEnabled, setMfaEnabled] = useState(user.mfaEnabled || false);
   const [mfaCode, setMfaCode] = useState("");
+  const [showMfaModal, setShowMfaModal] = useState(false);
+  const [mfaSecret, setMfaSecret] = useState<string | null>(null);
+  const [verifyingCode, setVerifyingCode] = useState(false);
   
   // Evitar erro de hidratação
   useEffect(() => {
@@ -69,45 +83,90 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
     return null;
   }
 
-  // URL para o QR Code do MFA (normalmente viria do backend)
-  const mfaQrCodeUrl = user.mfaSecret 
-    ? `otpauth://totp/Clinica:${encodeURIComponent(user.email || '')}?secret=${user.mfaSecret}&issuer=Clinica&algorithm=SHA1&digits=6&period=30`
-    : "";
+  // Gerar um segredo MFA aleatório para demonstração
+  const generateMfaSecret = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+    let secret = '';
+    for (let i = 0; i < 32; i++) {
+      secret += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return secret;
+  };
 
-  const handleMfaToggle = async () => {
-    setLoading(true);
-    
-    try {
-      if (!mfaEnabled && !user.mfaSecret) {
-        // Aqui seria feita a requisição para gerar o segredo MFA
+  // URL para o QR Code do MFA
+  const getMfaQrCodeUrl = (secret: string) => {
+    const issuer = encodeURIComponent('Clinica Médica');
+    const account = encodeURIComponent(user.email || 'usuario');
+    return `otpauth://totp/${issuer}:${account}?secret=${secret}&issuer=${issuer}&algorithm=SHA1&digits=6&period=30`;
+  };
+
+  const handleToggleMfa = async () => {
+    if (mfaEnabled) {
+      // Desativar MFA
+      setLoading(true);
+      try {
+        // Simulando chamada à API para desativar MFA
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        toast.success(t('config.security_mfa_enabled'), {
-          description: t('config.security_mfa_setup_desc')
-        });
-      } else if (!mfaEnabled && mfaCode) {
-        // Aqui seria feita a validação do código MFA
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        toast.success(t('config.security_mfa_verified'), {
-          description: t('config.security_mfa_success')
-        });
-      } else {
-        // Aqui seria feita a desativação do MFA
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        setMfaEnabled(false);
+        setMfaSecret(null);
         
         toast.success(t('config.security_mfa_disabled'), {
           description: t('config.security_mfa_disabled_desc')
         });
+      } catch (error) {
+        toast.error(t('config.security_mfa_error'), {
+          description: t('config.security_mfa_error_desc')
+        });
+      } finally {
+        setLoading(false);
       }
+    } else {
+      // Iniciar processo de ativação do MFA
+      const newSecret = generateMfaSecret();
+      setMfaSecret(newSecret);
+      setShowMfaModal(true);
+    }
+  };
+  
+  const handleVerifyMfaCode = async () => {
+    if (!mfaCode || mfaCode.length !== 6 || !/^\d+$/.test(mfaCode)) {
+      toast.error(t('config.security_mfa_error'), {
+        description: "O código deve conter 6 dígitos"
+      });
+      return;
+    }
+    
+    setVerifyingCode(true);
+    
+    try {
+      // Simulando verificação do código
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      setMfaEnabled(!mfaEnabled);
+      // Na implementação real, você validaria o código contra o segredo
+      // Para demonstração, consideramos válido
+      setMfaEnabled(true);
+      setShowMfaModal(false);
+      
+      toast.success(t('config.security_mfa_verified'), {
+        description: t('config.security_mfa_success')
+      });
     } catch (error) {
       toast.error(t('config.security_mfa_error'), {
         description: t('config.security_mfa_error_desc')
       });
     } finally {
-      setLoading(false);
+      setVerifyingCode(false);
+      setMfaCode("");
+    }
+  };
+  
+  const handleCopySecret = () => {
+    if (mfaSecret) {
+      navigator.clipboard.writeText(mfaSecret);
+      toast.success("Segredo copiado", {
+        description: "O código secreto foi copiado para a área de transferência"
+      });
     }
   };
 
@@ -153,250 +212,294 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
   };
 
   return (
-    <div className="container mx-auto py-6">
-      <h1 className="text-2xl font-bold mb-6 text-foreground">{t('config.title')}</h1>
-      
-      <Card className="border-primary/10 shadow-sm">
-        <CardHeader className="bg-primary/10 px-5 py-3 rounded-t-lg">
-          <CardTitle className="text-base">{t('config.preferences')}</CardTitle>
-          <CardDescription className="text-xs">{t('config.preferences_subtitle')}</CardDescription>
-        </CardHeader>
-        <CardContent className="p-5">
-          <Tabs defaultValue="tema" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted rounded-lg p-1 h-10">
-              <TabsTrigger 
-                value="tema" 
-                className="rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:font-medium flex items-center justify-center py-2 gap-2 transition-all duration-200 text-sm"
-              >
-                <Palette className="h-4 w-4" />
-                {t('config.theme')}
-              </TabsTrigger>
-              <TabsTrigger 
-                value="idioma" 
-                className="rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:font-medium flex items-center justify-center py-2 gap-2 transition-all duration-200 text-sm"
-              >
-                <Globe2 className="h-4 w-4" />
-                {t('config.language')}
-              </TabsTrigger>
-              <TabsTrigger 
-                value="seguranca" 
-                className="rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:font-medium flex items-center justify-center py-2 gap-2 transition-all duration-200 text-sm"
-              >
-                <Shield className="h-4 w-4" />
-                {t('config.security')}
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="tema" className="space-y-4 animate-in fade-in-50">
-              <div className="space-y-4">
-                <div className="grid grid-cols-3 gap-4">
-                  <Card 
-                    className={`relative cursor-pointer transition-all duration-200 hover:shadow-md ${theme === 'light' ? 'ring-2 ring-primary' : 'hover:ring-1 hover:ring-primary/20'}`}
-                    onClick={() => setTheme('light')}
-                  >
-                    <CardContent className="p-4 flex flex-col items-center gap-2">
-                      <Sun className="h-6 w-6 text-primary" />
-                      <span className="text-sm font-medium">{t('config.theme_light')}</span>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card 
-                    className={`relative cursor-pointer transition-all duration-200 hover:shadow-md ${theme === 'dark' ? 'ring-2 ring-primary' : 'hover:ring-1 hover:ring-primary/20'}`}
-                    onClick={() => setTheme('dark')}
-                  >
-                    <CardContent className="p-4 flex flex-col items-center gap-2">
-                      <Moon className="h-6 w-6 text-primary" />
-                      <span className="text-sm font-medium">{t('config.theme_dark')}</span>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card 
-                    className={`relative cursor-pointer transition-all duration-200 hover:shadow-md ${theme === 'system' ? 'ring-2 ring-primary' : 'hover:ring-1 hover:ring-primary/20'}`}
-                    onClick={() => setTheme('system')}
-                  >
-                    <CardContent className="p-4 flex flex-col items-center gap-2">
-                      <Monitor className="h-6 w-6 text-primary" />
-                      <span className="text-sm font-medium">{t('config.theme_system')}</span>
-                    </CardContent>
-                  </Card>
-                </div>
-                
-                <p className="text-xs text-muted-foreground">
-                  {t('config.theme_description')}
-                </p>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="idioma" className="space-y-4 animate-in fade-in-50">
-              <div className="space-y-4">
-                <Label className="text-sm font-medium">{t('config.language_select')}</Label>
-                
-                <div className="flex flex-row justify-center gap-4">
-                  <button
-                    className={`flex flex-col items-center justify-center p-4 border rounded-lg transition-all w-1/3
-                      ${language === 'pt-BR' 
-                        ? 'bg-primary/10 border-primary ring-2 ring-primary/50' 
-                        : 'border-border hover:border-primary/20 hover:bg-muted/50'}`}
-                    onClick={() => handleLanguageChange('pt-BR')}
-                    disabled={loadingLanguage !== null}
-                  >
-                    <div className="relative h-20 w-32 overflow-hidden rounded-md shadow-sm mb-3 flex items-center justify-center">
-                      <span className="fi fi-br w-full h-full" style={{ transform: 'scale(3)' }} />
-                      {language === 'pt-BR' && (
-                        <div className="absolute right-2 bottom-2 bg-primary rounded-full p-1 z-10">
-                          <Check className="h-4 w-4 text-white" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex flex-col items-center text-center">
-                      <span className="font-medium">{t('config.language_pt')}</span>
-                      <span className="text-xs text-muted-foreground">{t('config.language_pt_region')}</span>
-                    </div>
-                    {loadingLanguage === 'pt-BR' && (
-                      <Loader2 className="mt-2 h-4 w-4 animate-spin text-primary" />
-                    )}
-                  </button>
-                  
-                  <button
-                    className={`flex flex-col items-center justify-center p-4 border rounded-lg transition-all w-1/3
-                      ${language === 'en-US' 
-                        ? 'bg-primary/10 border-primary ring-2 ring-primary/50' 
-                        : 'border-border hover:border-primary/20 hover:bg-muted/50'}`}
-                    onClick={() => handleLanguageChange('en-US')}
-                    disabled={loadingLanguage !== null}
-                  >
-                    <div className="relative h-20 w-32 overflow-hidden rounded-md shadow-sm mb-3 flex items-center justify-center">
-                      <span className="fi fi-us w-full h-full" style={{ transform: 'scale(3)' }} />
-                      {language === 'en-US' && (
-                        <div className="absolute right-2 bottom-2 bg-primary rounded-full p-1 z-10">
-                          <Check className="h-4 w-4 text-white" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex flex-col items-center text-center">
-                      <span className="font-medium">{t('config.language_en')}</span>
-                      <span className="text-xs text-muted-foreground">{t('config.language_en_region')}</span>
-                    </div>
-                    {loadingLanguage === 'en-US' && (
-                      <Loader2 className="mt-2 h-4 w-4 animate-spin text-primary" />
-                    )}
-                  </button>
-                  
-                  <button
-                    className={`flex flex-col items-center justify-center p-4 border rounded-lg transition-all w-1/3
-                      ${language === 'es-ES' 
-                        ? 'bg-primary/10 border-primary ring-2 ring-primary/50' 
-                        : 'border-border hover:border-primary/20 hover:bg-muted/50'}`}
-                    onClick={() => handleLanguageChange('es-ES')}
-                    disabled={loadingLanguage !== null}
-                  >
-                    <div className="relative h-20 w-32 overflow-hidden rounded-md shadow-sm mb-3 flex items-center justify-center">
-                      <span className="fi fi-es w-full h-full" style={{ transform: 'scale(3)' }} />
-                      {language === 'es-ES' && (
-                        <div className="absolute right-2 bottom-2 bg-primary rounded-full p-1 z-10">
-                          <Check className="h-4 w-4 text-white" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex flex-col items-center text-center">
-                      <span className="font-medium">{t('config.language_es')}</span>
-                      <span className="text-xs text-muted-foreground">{t('config.language_es_region')}</span>
-                    </div>
-                    {loadingLanguage === 'es-ES' && (
-                      <Loader2 className="mt-2 h-4 w-4 animate-spin text-primary" />
-                    )}
-                  </button>
-                </div>
-                
-                <p className="text-xs text-muted-foreground text-center">
-                  {t('config.language_description')}
-                </p>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="seguranca" className="space-y-4 animate-in fade-in-50">
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <Label className="text-sm font-medium">{t('config.security_2fa')}</Label>
-                    <p className="text-xs text-muted-foreground">
-                      {t('config.security_2fa_description')}
-                    </p>
+    <>
+      <div className="container mx-auto py-6">
+        <h1 className="text-2xl font-bold mb-6 text-foreground">{t('config.title')}</h1>
+        
+        <Card className="border-primary/10 shadow-sm">
+          <CardHeader className="bg-primary/10 px-5 py-3 rounded-t-lg">
+            <CardTitle className="text-base">{t('config.preferences')}</CardTitle>
+            <CardDescription className="text-xs">{t('config.preferences_subtitle')}</CardDescription>
+          </CardHeader>
+          <CardContent className="p-5">
+            <Tabs defaultValue="tema" className="w-full">
+              <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted rounded-lg p-1 h-10">
+                <TabsTrigger 
+                  value="tema" 
+                  className="rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:font-medium flex items-center justify-center py-2 gap-2 transition-all duration-200 text-sm"
+                >
+                  <Palette className="h-4 w-4" />
+                  {t('config.theme')}
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="idioma" 
+                  className="rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:font-medium flex items-center justify-center py-2 gap-2 transition-all duration-200 text-sm"
+                >
+                  <Globe2 className="h-4 w-4" />
+                  {t('config.language')}
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="seguranca" 
+                  className="rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:font-medium flex items-center justify-center py-2 gap-2 transition-all duration-200 text-sm"
+                >
+                  <Shield className="h-4 w-4" />
+                  {t('config.security')}
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="tema" className="space-y-4 animate-in fade-in-50">
+                <div className="space-y-4">
+                  <div className="grid grid-cols-3 gap-4">
+                    <Card 
+                      className={`relative cursor-pointer transition-all duration-200 hover:shadow-md ${theme === 'light' ? 'ring-2 ring-primary' : 'hover:ring-1 hover:ring-primary/20'}`}
+                      onClick={() => setTheme('light')}
+                    >
+                      <CardContent className="p-4 flex flex-col items-center gap-2">
+                        <Sun className="h-6 w-6 text-primary" />
+                        <span className="text-sm font-medium">{t('config.theme_light')}</span>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card 
+                      className={`relative cursor-pointer transition-all duration-200 hover:shadow-md ${theme === 'dark' ? 'ring-2 ring-primary' : 'hover:ring-1 hover:ring-primary/20'}`}
+                      onClick={() => setTheme('dark')}
+                    >
+                      <CardContent className="p-4 flex flex-col items-center gap-2">
+                        <Moon className="h-6 w-6 text-primary" />
+                        <span className="text-sm font-medium">{t('config.theme_dark')}</span>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card 
+                      className={`relative cursor-pointer transition-all duration-200 hover:shadow-md ${theme === 'system' ? 'ring-2 ring-primary' : 'hover:ring-1 hover:ring-primary/20'}`}
+                      onClick={() => setTheme('system')}
+                    >
+                      <CardContent className="p-4 flex flex-col items-center gap-2">
+                        <Monitor className="h-6 w-6 text-primary" />
+                        <span className="text-sm font-medium">{t('config.theme_system')}</span>
+                      </CardContent>
+                    </Card>
                   </div>
-                  <Switch
-                    checked={mfaEnabled}
-                    onCheckedChange={handleMfaToggle}
-                    disabled={loading}
-                  />
+                  
+                  <p className="text-xs text-muted-foreground">
+                    {t('config.theme_description')}
+                  </p>
                 </div>
-                
-                {mfaEnabled && !user.mfaSecret && (
-                  <div className="space-y-4 border rounded-lg p-4 bg-muted/10">
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium">{t('config.security_configure')}</Label>
+              </TabsContent>
+              
+              <TabsContent value="idioma" className="space-y-4 animate-in fade-in-50">
+                <div className="space-y-4">
+                  <Label className="text-sm font-medium">{t('config.language_select')}</Label>
+                  
+                  <div className="flex flex-row justify-center gap-4">
+                    <button
+                      className={`flex flex-col items-center justify-center p-4 border rounded-lg transition-all w-1/3
+                        ${language === 'pt-BR' 
+                          ? 'bg-primary/10 border-primary ring-2 ring-primary/50' 
+                          : 'border-border hover:border-primary/20 hover:bg-muted/50'}`}
+                      onClick={() => handleLanguageChange('pt-BR')}
+                      disabled={loadingLanguage !== null}
+                    >
+                      <div className="relative h-20 w-32 overflow-hidden rounded-md shadow-sm mb-3 flex items-center justify-center">
+                        <span className="fi fi-br w-full h-full" style={{ transform: 'scale(3)' }} />
+                        {language === 'pt-BR' && (
+                          <div className="absolute right-2 bottom-2 bg-primary rounded-full p-1 z-10">
+                            <Check className="h-4 w-4 text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex flex-col items-center text-center">
+                        <span className="font-medium">{t('config.language_pt')}</span>
+                        <span className="text-xs text-muted-foreground">{t('config.language_pt_region')}</span>
+                      </div>
+                      {loadingLanguage === 'pt-BR' && (
+                        <Loader2 className="mt-2 h-4 w-4 animate-spin text-primary" />
+                      )}
+                    </button>
+                    
+                    <button
+                      className={`flex flex-col items-center justify-center p-4 border rounded-lg transition-all w-1/3
+                        ${language === 'en-US' 
+                          ? 'bg-primary/10 border-primary ring-2 ring-primary/50' 
+                          : 'border-border hover:border-primary/20 hover:bg-muted/50'}`}
+                      onClick={() => handleLanguageChange('en-US')}
+                      disabled={loadingLanguage !== null}
+                    >
+                      <div className="relative h-20 w-32 overflow-hidden rounded-md shadow-sm mb-3 flex items-center justify-center">
+                        <span className="fi fi-us w-full h-full" style={{ transform: 'scale(3)' }} />
+                        {language === 'en-US' && (
+                          <div className="absolute right-2 bottom-2 bg-primary rounded-full p-1 z-10">
+                            <Check className="h-4 w-4 text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex flex-col items-center text-center">
+                        <span className="font-medium">{t('config.language_en')}</span>
+                        <span className="text-xs text-muted-foreground">{t('config.language_en_region')}</span>
+                      </div>
+                      {loadingLanguage === 'en-US' && (
+                        <Loader2 className="mt-2 h-4 w-4 animate-spin text-primary" />
+                      )}
+                    </button>
+                    
+                    <button
+                      className={`flex flex-col items-center justify-center p-4 border rounded-lg transition-all w-1/3
+                        ${language === 'es-ES' 
+                          ? 'bg-primary/10 border-primary ring-2 ring-primary/50' 
+                          : 'border-border hover:border-primary/20 hover:bg-muted/50'}`}
+                      onClick={() => handleLanguageChange('es-ES')}
+                      disabled={loadingLanguage !== null}
+                    >
+                      <div className="relative h-20 w-32 overflow-hidden rounded-md shadow-sm mb-3 flex items-center justify-center">
+                        <span className="fi fi-es w-full h-full" style={{ transform: 'scale(3)' }} />
+                        {language === 'es-ES' && (
+                          <div className="absolute right-2 bottom-2 bg-primary rounded-full p-1 z-10">
+                            <Check className="h-4 w-4 text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex flex-col items-center text-center">
+                        <span className="font-medium">{t('config.language_es')}</span>
+                        <span className="text-xs text-muted-foreground">{t('config.language_es_region')}</span>
+                      </div>
+                      {loadingLanguage === 'es-ES' && (
+                        <Loader2 className="mt-2 h-4 w-4 animate-spin text-primary" />
+                      )}
+                    </button>
+                  </div>
+                  
+                  <p className="text-xs text-muted-foreground text-center">
+                    {t('config.language_description')}
+                  </p>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="seguranca" className="space-y-4 animate-in fade-in-50">
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <Label className="text-sm font-medium">{t('config.security_2fa')}</Label>
                       <p className="text-xs text-muted-foreground">
-                        {t('config.security_configure_description')}
+                        {t('config.security_2fa_description')}
                       </p>
                     </div>
-                    
-                    <div className="flex justify-center p-4 bg-white dark:bg-slate-200 rounded-lg">
-                      <QRCodeSVG 
-                        value={mfaQrCodeUrl} 
-                        size={200}
-                        bgColor={"#FFFFFF"} 
-                        fgColor={"#000000"}
-                        level={"H"}
-                        includeMargin={true}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="mfa-code" className="text-xs font-medium">
-                        {t('config.security_code')}
-                      </Label>
-                      <div className="flex gap-2">
-                        <Input
-                          id="mfa-code"
-                          value={mfaCode}
-                          onChange={(e) => setMfaCode(e.target.value)}
-                          placeholder="000000"
-                          className="h-9 text-sm"
-                          maxLength={6}
-                        />
-                        <Button 
-                          onClick={handleMfaToggle}
-                          disabled={loading || !mfaCode || mfaCode.length !== 6}
-                          className="h-9 text-sm"
-                          size="sm"
-                        >
-                          {loading ? (
-                            <>
-                              <Loader2 className="mr-2 h-3 w-3 animate-spin" />
-                              <span>{t('config.security_verifying')}</span>
-                            </>
-                          ) : (
-                            <>
-                              <ShieldCheck className="mr-2 h-3 w-3" />
-                              <span>{t('config.security_verify')}</span>
-                            </>
-                          )}
-                        </Button>
-                      </div>
-                    </div>
+                    <Switch
+                      checked={mfaEnabled}
+                      onCheckedChange={handleToggleMfa}
+                      disabled={loading}
+                    />
                   </div>
-                )}
-                
-                {mfaEnabled && user.mfaSecret && (
-                  <div className="flex items-center gap-2 text-sm text-green-500">
-                    <ShieldCheck className="h-4 w-4" />
-                    <span>{t('config.security_active')}</span>
-                  </div>
-                )}
+                  
+                  {mfaEnabled && (
+                    <div className="flex items-center gap-2 text-sm text-green-500 bg-green-50 dark:bg-green-950/20 p-3 rounded-lg">
+                      <ShieldCheck className="h-5 w-5" />
+                      <span>{t('config.security_active')}</span>
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
+      
+      {/* Modal de configuração do MFA */}
+      <Dialog open={showMfaModal} onOpenChange={setShowMfaModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t('config.security_configure')}</DialogTitle>
+            <DialogDescription>
+              {t('config.security_configure_description')}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6 py-4">
+            {/* QR Code */}
+            <div className="flex justify-center p-4 bg-white dark:bg-gray-100 rounded-lg border">
+              {mfaSecret && (
+                <QRCodeSVG 
+                  value={getMfaQrCodeUrl(mfaSecret)} 
+                  size={220}
+                  bgColor={"#FFFFFF"} 
+                  fgColor={"#000000"}
+                  level={"H"}
+                  includeMargin={true}
+                />
+              )}
+            </div>
+            
+            {/* Código secreto */}
+            <div className="space-y-2">
+              <Label>Código secreto</Label>
+              <div className="flex items-center space-x-2">
+                <div className="bg-muted p-2 rounded-md text-center flex-1 font-mono text-sm break-all">
+                  {mfaSecret?.match(/.{1,4}/g)?.join(' ')}
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  onClick={handleCopySecret}
+                  title="Copiar código"
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
               </div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
-    </div>
+              <p className="text-xs text-muted-foreground">
+                Se não conseguir escanear o QR code, digite este código no seu aplicativo.
+              </p>
+            </div>
+            
+            {/* Validação do código */}
+            <div className="space-y-2">
+              <Label htmlFor="mfa-verification-code">
+                {t('config.security_code')}
+              </Label>
+              <Input
+                id="mfa-verification-code"
+                placeholder="000000"
+                value={mfaCode}
+                onChange={(e) => setMfaCode(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
+                className="font-mono text-center text-lg tracking-widest"
+                maxLength={6}
+              />
+              <p className="text-xs text-muted-foreground">
+                Digite o código de 6 dígitos exibido no seu aplicativo autenticador.
+              </p>
+            </div>
+          </div>
+          
+          <DialogFooter className="sm:justify-between">
+            <Button 
+              variant="ghost" 
+              onClick={() => {
+                setShowMfaModal(false);
+                setMfaCode("");
+                setMfaSecret(null);
+              }}
+              disabled={verifyingCode}
+            >
+              <X className="mr-2 h-4 w-4" />
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleVerifyMfaCode}
+              disabled={verifyingCode || !mfaCode || mfaCode.length !== 6}
+            >
+              {verifyingCode ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {t('config.security_verifying')}
+                </>
+              ) : (
+                <>
+                  <ShieldCheck className="mr-2 h-4 w-4" />
+                  {t('config.security_verify')}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 } 
