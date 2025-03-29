@@ -15,13 +15,6 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -36,9 +29,12 @@ import {
   ShieldCheck,
   ShieldAlert,
   Palette,
+  Check,
 } from "lucide-react";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
+import { useLanguage } from "@/contexts/language-context";
+import 'flag-icons/css/flag-icons.min.css';
 
 interface ConfiguracoesFormProps {
   user: {
@@ -52,11 +48,11 @@ interface ConfiguracoesFormProps {
 
 export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
   const { theme, setTheme } = useTheme();
+  const { language, setLanguage } = useLanguage();
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mfaEnabled, setMfaEnabled] = useState(user.mfaEnabled || false);
   const [mfaCode, setMfaCode] = useState("");
-  const [idioma, setIdioma] = useState("pt-BR");
   
   // Evitar erro de hidratação
   useEffect(() => {
@@ -111,11 +107,12 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
 
   const handleLanguageChange = async (value: string) => {
     setLoading(true);
-    setIdioma(value);
     
     try {
       // Aqui seria feita a atualização do idioma no servidor
       await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setLanguage(value as any);
       
       toast.success("Idioma alterado", {
         description: "O idioma foi alterado com sucesso."
@@ -206,18 +203,83 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
             
             <TabsContent value="idioma" className="space-y-4 animate-in fade-in-50">
               <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <Label className="text-xs font-medium">Selecione o idioma</Label>
-                  <Select value={idioma} onValueChange={handleLanguageChange} disabled={loading}>
-                    <SelectTrigger className="h-9 text-sm">
-                      <SelectValue placeholder="Selecione o idioma" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="pt-BR">Português (Brasil)</SelectItem>
-                      <SelectItem value="en-US">English (US)</SelectItem>
-                      <SelectItem value="es">Español</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <Label className="text-sm font-medium">Selecione o idioma</Label>
+                
+                <div className="grid grid-cols-1 gap-4">
+                  <button
+                    className={`flex items-center p-4 border rounded-lg transition-all
+                      ${language === 'pt-BR' 
+                        ? 'bg-primary/10 border-primary ring-2 ring-primary/50' 
+                        : 'border-border hover:border-primary/20 hover:bg-muted/50'}`}
+                    onClick={() => handleLanguageChange('pt-BR')}
+                    disabled={loading}
+                  >
+                    <div className="relative h-10 w-16 overflow-hidden rounded shadow-sm mr-4">
+                      <span className="fi fi-br absolute inset-0" />
+                      {language === 'pt-BR' && (
+                        <div className="absolute right-0 bottom-0 bg-primary rounded-full p-0.5">
+                          <Check className="h-3 w-3 text-white" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-medium">Português (Brasil)</span>
+                      <span className="text-xs text-muted-foreground">Português Brasileiro</span>
+                    </div>
+                    {loading && language === 'pt-BR' && (
+                      <Loader2 className="ml-auto h-4 w-4 animate-spin text-primary" />
+                    )}
+                  </button>
+                  
+                  <button
+                    className={`flex items-center p-4 border rounded-lg transition-all
+                      ${language === 'en-US' 
+                        ? 'bg-primary/10 border-primary ring-2 ring-primary/50' 
+                        : 'border-border hover:border-primary/20 hover:bg-muted/50'}`}
+                    onClick={() => handleLanguageChange('en-US')}
+                    disabled={loading}
+                  >
+                    <div className="relative h-10 w-16 overflow-hidden rounded shadow-sm mr-4">
+                      <span className="fi fi-us absolute inset-0" />
+                      {language === 'en-US' && (
+                        <div className="absolute right-0 bottom-0 bg-primary rounded-full p-0.5">
+                          <Check className="h-3 w-3 text-white" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-medium">English (US)</span>
+                      <span className="text-xs text-muted-foreground">American English</span>
+                    </div>
+                    {loading && language === 'en-US' && (
+                      <Loader2 className="ml-auto h-4 w-4 animate-spin text-primary" />
+                    )}
+                  </button>
+                  
+                  <button
+                    className={`flex items-center p-4 border rounded-lg transition-all
+                      ${language === 'es-ES' 
+                        ? 'bg-primary/10 border-primary ring-2 ring-primary/50' 
+                        : 'border-border hover:border-primary/20 hover:bg-muted/50'}`}
+                    onClick={() => handleLanguageChange('es-ES')}
+                    disabled={loading}
+                  >
+                    <div className="relative h-10 w-16 overflow-hidden rounded shadow-sm mr-4">
+                      <span className="fi fi-es absolute inset-0" />
+                      {language === 'es-ES' && (
+                        <div className="absolute right-0 bottom-0 bg-primary rounded-full p-0.5">
+                          <Check className="h-3 w-3 text-white" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-medium">Español (España)</span>
+                      <span className="text-xs text-muted-foreground">Español de España</span>
+                    </div>
+                    {loading && language === 'es-ES' && (
+                      <Loader2 className="ml-auto h-4 w-4 animate-spin text-primary" />
+                    )}
+                  </button>
                 </div>
                 
                 <p className="text-xs text-muted-foreground">
