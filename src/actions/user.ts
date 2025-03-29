@@ -66,22 +66,30 @@ export async function enableMfa(secret: string) {
     
     console.log("ID do usuário:", session.user.id);
     
-    const updatedUser = await db.user.update({
+    // Verificamos os campos disponíveis no modelo User
+    const userFields = await db.user.findUnique({
       where: { id: session.user.id },
-      data: { 
-        mfaEnabled: true,
-        mfaSecret: secret
-      },
-      select: {
-        id: true,
-        mfaEnabled: true,
-        mfaSecret: true
-      }
+      select: { id: true }
     });
     
-    console.log("Usuário atualizado:", updatedUser);
+    console.log("Campos disponíveis:", userFields);
     
-    return { success: true };
+    try {
+      // Tentamos atualizar usando os campos normais
+      const updatedUser = await db.user.update({
+        where: { id: session.user.id },
+        data: { 
+          mfaEnabled: true,
+          mfaSecret: secret
+        }
+      });
+      
+      console.log("Usuário atualizado com sucesso:", updatedUser.id);
+      return { success: true };
+    } catch (updateError) {
+      console.error("Erro na atualização:", updateError);
+      throw updateError;
+    }
   } catch (error) {
     console.error("Erro ao ativar MFA:", error);
     

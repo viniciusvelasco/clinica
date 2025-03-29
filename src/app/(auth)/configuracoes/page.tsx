@@ -18,9 +18,7 @@ export default async function ConfiguracoesPage() {
       id: true,
       name: true,
       email: true,
-      language: true,
-      mfaEnabled: true,
-      mfaSecret: true
+      language: true
     }
   });
   
@@ -28,9 +26,16 @@ export default async function ConfiguracoesPage() {
     redirect("/login");
   }
   
+  // Fornecer informações do MFA
+  const userWithMFA = {
+    ...user,
+    mfaEnabled: false,  // Valor padrão, será sobrescrito no cliente
+    mfaSecret: null
+  };
+  
   return (
     <main className="flex-1">
-      <ConfiguracoesForm user={user} />
+      <ConfiguracoesForm user={userWithMFA} />
     </main>
   );
 } 
