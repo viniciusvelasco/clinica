@@ -205,84 +205,84 @@ export function ConfiguracoesForm({ user }: ConfiguracoesFormProps) {
               <div className="space-y-4">
                 <Label className="text-sm font-medium">Selecione o idioma</Label>
                 
-                <div className="grid grid-cols-1 gap-4">
+                <div className="flex flex-row justify-center gap-4">
                   <button
-                    className={`flex items-center p-4 border rounded-lg transition-all
+                    className={`flex flex-col items-center justify-center p-4 border rounded-lg transition-all w-1/3
                       ${language === 'pt-BR' 
                         ? 'bg-primary/10 border-primary ring-2 ring-primary/50' 
                         : 'border-border hover:border-primary/20 hover:bg-muted/50'}`}
                     onClick={() => handleLanguageChange('pt-BR')}
                     disabled={loading}
                   >
-                    <div className="relative h-10 w-16 overflow-hidden rounded shadow-sm mr-4">
+                    <div className="relative h-20 w-32 overflow-hidden rounded-md shadow-sm mb-3">
                       <span className="fi fi-br absolute inset-0" />
                       {language === 'pt-BR' && (
-                        <div className="absolute right-0 bottom-0 bg-primary rounded-full p-0.5">
-                          <Check className="h-3 w-3 text-white" />
+                        <div className="absolute right-2 bottom-2 bg-primary rounded-full p-1">
+                          <Check className="h-4 w-4 text-white" />
                         </div>
                       )}
                     </div>
-                    <div className="flex flex-col">
-                      <span className="font-medium">Português (Brasil)</span>
-                      <span className="text-xs text-muted-foreground">Português Brasileiro</span>
+                    <div className="flex flex-col items-center text-center">
+                      <span className="font-medium">Português</span>
+                      <span className="text-xs text-muted-foreground">Brasil</span>
                     </div>
                     {loading && language === 'pt-BR' && (
-                      <Loader2 className="ml-auto h-4 w-4 animate-spin text-primary" />
+                      <Loader2 className="mt-2 h-4 w-4 animate-spin text-primary" />
                     )}
                   </button>
                   
                   <button
-                    className={`flex items-center p-4 border rounded-lg transition-all
+                    className={`flex flex-col items-center justify-center p-4 border rounded-lg transition-all w-1/3
                       ${language === 'en-US' 
                         ? 'bg-primary/10 border-primary ring-2 ring-primary/50' 
                         : 'border-border hover:border-primary/20 hover:bg-muted/50'}`}
                     onClick={() => handleLanguageChange('en-US')}
                     disabled={loading}
                   >
-                    <div className="relative h-10 w-16 overflow-hidden rounded shadow-sm mr-4">
+                    <div className="relative h-20 w-32 overflow-hidden rounded-md shadow-sm mb-3">
                       <span className="fi fi-us absolute inset-0" />
                       {language === 'en-US' && (
-                        <div className="absolute right-0 bottom-0 bg-primary rounded-full p-0.5">
-                          <Check className="h-3 w-3 text-white" />
+                        <div className="absolute right-2 bottom-2 bg-primary rounded-full p-1">
+                          <Check className="h-4 w-4 text-white" />
                         </div>
                       )}
                     </div>
-                    <div className="flex flex-col">
-                      <span className="font-medium">English (US)</span>
-                      <span className="text-xs text-muted-foreground">American English</span>
+                    <div className="flex flex-col items-center text-center">
+                      <span className="font-medium">English</span>
+                      <span className="text-xs text-muted-foreground">United States</span>
                     </div>
                     {loading && language === 'en-US' && (
-                      <Loader2 className="ml-auto h-4 w-4 animate-spin text-primary" />
+                      <Loader2 className="mt-2 h-4 w-4 animate-spin text-primary" />
                     )}
                   </button>
                   
                   <button
-                    className={`flex items-center p-4 border rounded-lg transition-all
+                    className={`flex flex-col items-center justify-center p-4 border rounded-lg transition-all w-1/3
                       ${language === 'es-ES' 
                         ? 'bg-primary/10 border-primary ring-2 ring-primary/50' 
                         : 'border-border hover:border-primary/20 hover:bg-muted/50'}`}
                     onClick={() => handleLanguageChange('es-ES')}
                     disabled={loading}
                   >
-                    <div className="relative h-10 w-16 overflow-hidden rounded shadow-sm mr-4">
+                    <div className="relative h-20 w-32 overflow-hidden rounded-md shadow-sm mb-3">
                       <span className="fi fi-es absolute inset-0" />
                       {language === 'es-ES' && (
-                        <div className="absolute right-0 bottom-0 bg-primary rounded-full p-0.5">
-                          <Check className="h-3 w-3 text-white" />
+                        <div className="absolute right-2 bottom-2 bg-primary rounded-full p-1">
+                          <Check className="h-4 w-4 text-white" />
                         </div>
                       )}
                     </div>
-                    <div className="flex flex-col">
-                      <span className="font-medium">Español (España)</span>
-                      <span className="text-xs text-muted-foreground">Español de España</span>
+                    <div className="flex flex-col items-center text-center">
+                      <span className="font-medium">Español</span>
+                      <span className="text-xs text-muted-foreground">España</span>
                     </div>
                     {loading && language === 'es-ES' && (
-                      <Loader2 className="ml-auto h-4 w-4 animate-spin text-primary" />
+                      <Loader2 className="mt-2 h-4 w-4 animate-spin text-primary" />
                     )}
                   </button>
                 </div>
                 
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground text-center">
                   O idioma selecionado será aplicado em toda a interface do sistema.
                 </p>
               </div>
