@@ -76,15 +76,27 @@ export default function LoginPage() {
       }
 
       // Verificar se o resultado tem flag de MFA necessário
-      const userData = await fetch("/api/auth/session").then(res => res.json());
-      
-      if (userData?.user?.mfaRequired) {
-        // Mostrar tela de verificação MFA
-        setUserId(userData.user.id);
-        setMfaSecret(userData.user.mfaSecret);
-        setShowMfa(true);
-        setIsLoading(false);
-        return;
+      if (result?.ok) {
+        // Buscar dados do usuário para verificar MFA
+        const session = await fetch("/api/auth/session").then(res => res.json());
+        console.log("Sessão:", session);
+        
+        // Verificar se o usuário na sessão atual tem MFA ativado
+        try {
+          const userResponse = await fetch(`/api/user/check-mfa?userId=${session.user.id}`);
+          const userData = await userResponse.json();
+          
+          if (userData.mfaEnabled) {
+            // Mostrar tela de verificação MFA
+            setUserId(session.user.id);
+            setMfaSecret(userData.mfaSecret);
+            setShowMfa(true);
+            setIsLoading(false);
+            return;
+          }
+        } catch (mfaError) {
+          console.error("Erro ao verificar MFA:", mfaError);
+        }
       }
 
       // Login normal sem MFA
